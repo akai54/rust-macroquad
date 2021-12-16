@@ -1,7 +1,7 @@
 // Utilisation des bibliotheques necessaires.
 use macroquad::prelude::*;
 
-use macroquad_tiled as tiled;
+// use macroquad_tiled as tiled;
 
 #[macroquad::main("Platformer")]
 async fn main() {
@@ -23,7 +23,12 @@ async fn main() {
        viewport: Option<(i32, i32, i32, i32)>
        */
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, 320.0, 152.0));
+    
+    //Ajout texture Personnage (120 x 201).
+    let bunny = load_texture("../GFX/Players/bunny1_stand.png").await;
 
+    let width = 1000;
+    let height = 800;
     loop {
         clear_background(WHITE);
         
