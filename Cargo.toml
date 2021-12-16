@@ -7,3 +7,4 @@ edition = "2018"
 
 [dependencies]
 macroquad = "0.3"
+macroquad-tiled = "0.1"
