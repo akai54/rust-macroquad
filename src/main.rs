@@ -24,6 +24,9 @@ async fn main() {
        */
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, 320.0, 152.0));
     
+    //Ajout tileset
+    let tileset = load_texture("../Tilemap/spritesheet_jumper.png").await;
+
     //Ajout texture Personnage (120 x 201).
     let bunny = load_texture("../GFX/Players/bunny1_stand.png").await;
 
