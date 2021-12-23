@@ -32,16 +32,16 @@ async fn main() {
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, 320.0, 152.0));
     
     //Ajout tileset
-    let _tileset = load_texture("../Tilemap/spritesheet_jumper.png").await;
+    let tileset = load_texture("../Tilemap/spritesheet_jumper.png").await;
 
     //Ajout texture Personnage (120 x 201).
-    let _bunny = load_texture("../GFX/Players/bunny1_stand.png").await;
+    let bunny = load_texture("../GFX/Players/bunny1_stand.png").await;
     
     let mut _ennemie: Vec<Ennemie> = Vec::new();
-    let _ennemie_tex = load_texture("images/sun.png").await;
+    let ennemie_tex = load_texture("images/sun.png").await;
 
-    let _width = 1000;
-    let _height = 800;
+    let width = 1000;
+    let height = 800;
 
 
     
