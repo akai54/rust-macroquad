@@ -3,13 +3,6 @@ use macroquad::prelude::*;
 
 // use macroquad_tiled as tiled;
 
-struct Ennemie {
-    pos: Vec2,
-    color: Color,
-    speed : Vec2,
-}
-
-
 #[macroquad::main("Platformer")]
 async fn main() {
 
@@ -35,13 +28,18 @@ async fn main() {
     let tileset = load_texture("../Tilemap/spritesheet_jumper.png").await;
 
     //Ajout texture Personnage (120 x 201).
-    let bunny = load_texture("../GFX/Players/bunny1_stand.png").await;
+    let bunny = Texture2D::from_file_with_format(
+    include_bytes!("../GFX/Players/bunny1_ready.png"), 
+    None,
+    );
     
-    let mut _ennemie: Vec<Ennemie> = Vec::new();
-    let ennemie_tex = load_texture("images/sun.png").await;
+    let ennemie = Texture2D::from_file_with_format(
+    include_bytes!("../images/sun1.png"),
+    None,
+    );
 
-    let width = 1000;
-    let height = 800;
+    let width = 700;
+    let height = 500;
 
 
     
@@ -50,7 +48,17 @@ async fn main() {
         
         //Choisir la caméra actif.
         set_camera(&camera);
-        
+
+        draw_texture_ex( 
+            ennemie, 
+            0.0, 
+            0.0, 
+            WHITE,
+            DrawTextureParams {
+            source: Some(Rect::new(0.0, 0.0, 100., 100.)),
+            ..Default::default()
+        },
+        );
         next_frame().await
     }
 }
