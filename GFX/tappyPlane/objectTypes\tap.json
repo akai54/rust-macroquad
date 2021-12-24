@@ -1,0 +1,87 @@
+{
+	"name": "tap",
+	"plugin-id": "Sprite",
+	"sid": 8761130745374788,
+	"isGlobal": false,
+	"instanceVariables": [],
+	"behaviorTypes": [],
+	"effectTypes": [],
+	"animations": {
+		"items": [
+			{
+				"frames": [
+					{
+						"width": 59,
+						"height": 59,
+						"originX": 0.508475,
+						"originY": 0.508475,
+						"originalSource": "",
+						"exportFormat": "png",
+						"exportQuality": 0.8,
+						"imageSpriteId": 6,
+						"collisionPoly": {
+							"points": [
+								0.355932,
+								0.355932,
+								0.491525,
+								0.338983,
+								0.559322,
+								0.440678,
+								0.898305,
+								0.491525,
+								0.864407,
+								0.864407,
+								0.491525,
+								0.830508,
+								0.40678,
+								0.59322,
+								0.355932,
+								0.491525
+							]
+						},
+						"duration": 1
+					},
+					{
+						"width": 59,
+						"height": 59,
+						"originX": 0.508475,
+						"originY": 0.508475,
+						"originalSource": "",
+						"exportFormat": "png",
+						"exportQuality": 0.8,
+						"imageSpriteId": 7,
+						"collisionPoly": {
+							"points": [
+								0.135593,
+								0.135593,
+								0.491525,
+								0,
+								0.559322,
+								0.440678,
+								0.898305,
+								0.491525,
+								0.864407,
+								0.864407,
+								0.491525,
+								0.830508,
+								0.40678,
+								0.59322,
+								0.355932,
+								0.491525
+							]
+						},
+						"duration": 1
+					}
+				],
+				"sid": 3936669957252992,
+				"name": "Default",
+				"isLooping": true,
+				"isPingPong": false,
+				"repeatCount": 1,
+				"repeatTo": 0,
+				"speed": 5
+			}
+		],
+		"subfolders": []
+	}
+}

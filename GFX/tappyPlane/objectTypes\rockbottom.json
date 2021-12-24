@@ -1,0 +1,50 @@
+{
+	"name": "rockBottom",
+	"plugin-id": "Sprite",
+	"sid": 3184873102262292,
+	"isGlobal": false,
+	"instanceVariables": [],
+	"behaviorTypes": [],
+	"effectTypes": [],
+	"animations": {
+		"items": [
+			{
+				"frames": [
+					{
+						"width": 108,
+						"height": 239,
+						"originX": 0.5,
+						"originY": 0.502092,
+						"originalSource": "",
+						"exportFormat": "png",
+						"exportQuality": 0.8,
+						"imageSpriteId": 4,
+						"collisionPoly": {
+							"points": [
+								0.583334,
+								0,
+								0.638889,
+								0,
+								0.990741,
+								0.995816,
+								0.00925926,
+								0.995816,
+								0.342593,
+								0.497908
+							]
+						},
+						"duration": 1
+					}
+				],
+				"sid": 4444392855597949,
+				"name": "Default",
+				"isLooping": false,
+				"isPingPong": false,
+				"repeatCount": 1,
+				"repeatTo": 0,
+				"speed": 5
+			}
+		],
+		"subfolders": []
+	}
+}

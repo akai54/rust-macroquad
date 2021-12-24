@@ -1,0 +1,368 @@
+{
+	"name": "Game sheet",
+	"events": [
+		{
+			"eventType": "variable",
+			"name": "offset",
+			"type": "number",
+			"initialValue": "0",
+			"comment": "",
+			"isStatic": false,
+			"isConstant": false,
+			"sid": 9264239009180720
+		},
+		{
+			"eventType": "variable",
+			"name": "gameStarted",
+			"type": "number",
+			"initialValue": "0",
+			"comment": "",
+			"isStatic": false,
+			"isConstant": false,
+			"sid": 4124637698006202
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-click",
+					"objectClass": "mouse",
+					"sid": 6696657162136166,
+					"parameters": {
+						"mouse-button": "left",
+						"click-type": "clicked"
+					}
+				}
+			],
+			"actions": [],
+			"sid": 9790252604394052,
+			"children": [
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "compare-eventvar",
+							"objectClass": "System",
+							"sid": 2275509616350264,
+							"parameters": {
+								"variable": "gameStarted",
+								"comparison": 0,
+								"value": "0"
+							}
+						}
+					],
+					"actions": [
+						{
+							"id": "set-eventvar-value",
+							"objectClass": "System",
+							"sid": 8287785441523026,
+							"parameters": {
+								"variable": "gameStarted",
+								"value": "1"
+							}
+						},
+						{
+							"id": "set-instvar-value",
+							"objectClass": "plane",
+							"sid": 8053045595237346,
+							"parameters": {
+								"instance-variable": "gravity",
+								"value": "-7"
+							}
+						},
+						{
+							"id": "set-visible",
+							"objectClass": "tap",
+							"sid": 5833122748041812,
+							"parameters": {
+								"visibility": "invisible"
+							}
+						}
+					],
+					"sid": 7718771214287364
+				},
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "else",
+							"objectClass": "System",
+							"sid": 5973614553173436
+						}
+					],
+					"actions": [
+						{
+							"id": "set-instvar-value",
+							"objectClass": "plane",
+							"sid": 9776906843256680,
+							"parameters": {
+								"instance-variable": "gravity",
+								"value": "-7"
+							}
+						}
+					],
+					"sid": 6253313254472725
+				}
+			]
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "every-x-seconds",
+					"objectClass": "System",
+					"sid": 4398354366758353,
+					"parameters": {
+						"interval-seconds": "2"
+					}
+				},
+				{
+					"id": "compare-eventvar",
+					"objectClass": "System",
+					"sid": 567661894562817,
+					"parameters": {
+						"variable": "gameStarted",
+						"comparison": 0,
+						"value": "1"
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "set-eventvar-value",
+					"objectClass": "System",
+					"sid": 1827886921111131,
+					"parameters": {
+						"variable": "offset",
+						"value": "random(-60) + random(60)"
+					}
+				},
+				{
+					"id": "create-object",
+					"objectClass": "System",
+					"sid": 5529241823719726,
+					"parameters": {
+						"object-to-create": "rockBottom",
+						"layer": "0",
+						"x": "930",
+						"y": "420 + offset"
+					}
+				},
+				{
+					"id": "create-object",
+					"objectClass": "System",
+					"sid": 5799092577909309,
+					"parameters": {
+						"object-to-create": "rockTop",
+						"layer": "0",
+						"x": "930",
+						"y": "40 + offset"
+					}
+				}
+			],
+			"sid": 3203645885152705
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "compare-x",
+					"objectClass": "bg",
+					"sid": 6316611138152307,
+					"parameters": {
+						"comparison": 2,
+						"x-co-ordinate": "-WindowWidth"
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "set-x",
+					"objectClass": "bg",
+					"sid": 4973825522818822,
+					"parameters": {
+						"x": "0"
+					}
+				}
+			],
+			"sid": 4297763744706421
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "compare-x",
+					"objectClass": "ground",
+					"sid": 1598080656408275,
+					"parameters": {
+						"comparison": 2,
+						"x-co-ordinate": "-WindowWidth"
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "set-x",
+					"objectClass": "ground",
+					"sid": 2458096715798694,
+					"parameters": {
+						"x": "0"
+					}
+				}
+			],
+			"sid": 6924860718549818
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "every-tick",
+					"objectClass": "System",
+					"sid": 6247287000625415
+				}
+			],
+			"actions": [
+				{
+					"id": "move-at-angle",
+					"objectClass": "rockBottom",
+					"sid": 1705660842325678,
+					"parameters": {
+						"angle": "0",
+						"distance": "-8"
+					}
+				},
+				{
+					"id": "move-at-angle",
+					"objectClass": "rockTop",
+					"sid": 974822968463987,
+					"parameters": {
+						"angle": "0",
+						"distance": "-8"
+					}
+				},
+				{
+					"id": "set-x",
+					"objectClass": "ground",
+					"sid": 3201497184624468,
+					"parameters": {
+						"x": "Self.X - 8"
+					}
+				},
+				{
+					"id": "set-x",
+					"objectClass": "bg",
+					"sid": 9565901941332468,
+					"parameters": {
+						"x": "Self.X - 4"
+					}
+				}
+			],
+			"sid": 155756393072386,
+			"children": [
+				{
+					"eventType": "block",
+					"conditions": [
+						{
+							"id": "compare-eventvar",
+							"objectClass": "System",
+							"sid": 947748545987186,
+							"parameters": {
+								"variable": "gameStarted",
+								"comparison": 0,
+								"value": "1"
+							}
+						}
+					],
+					"actions": [
+						{
+							"id": "add-to-instvar",
+							"objectClass": "plane",
+							"sid": 2702934411196494,
+							"parameters": {
+								"instance-variable": "gravity",
+								"value": "0.3"
+							}
+						},
+						{
+							"id": "set-y",
+							"objectClass": "plane",
+							"sid": 539061441611771,
+							"parameters": {
+								"y": "Self.Y + Self.gravity"
+							}
+						},
+						{
+							"id": "set-angle",
+							"objectClass": "plane",
+							"sid": 9243063508370320,
+							"parameters": {
+								"angle": "Self.gravity*2"
+							}
+						}
+					],
+					"sid": 5186931171147282
+				}
+			]
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-collision-with-another-object",
+					"objectClass": "plane",
+					"sid": 6914500396015099,
+					"parameters": {
+						"object": "rocks"
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "set-eventvar-value",
+					"objectClass": "System",
+					"sid": 1603302499423713,
+					"parameters": {
+						"variable": "gameStarted",
+						"value": "0"
+					}
+				},
+				{
+					"id": "restart-layout",
+					"objectClass": "System",
+					"sid": 986919124799889
+				}
+			],
+			"sid": 6354717453777177
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "on-start-of-layout",
+					"objectClass": "System",
+					"sid": 3289017902152851
+				}
+			],
+			"actions": [
+				{
+					"id": "set-width",
+					"objectClass": "ground",
+					"sid": 4529101728740825,
+					"parameters": {
+						"width": "self.Width*2"
+					}
+				},
+				{
+					"id": "set-width",
+					"objectClass": "bg",
+					"sid": 727031186294794,
+					"parameters": {
+						"width": "self.Width*2"
+					}
+				}
+			],
+			"sid": 9160896800272364
+		}
+	],
+	"sid": 615046260483111
+}

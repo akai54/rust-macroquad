@@ -1,0 +1,12 @@
+{
+	"name": "rocks",
+	"plugin-id": "Sprite",
+	"sid": 467383845650434,
+	"instanceVariables": [],
+	"behaviorTypes": [],
+	"effectTypes": [],
+	"members": [
+		"rockBottom",
+		"rockTop"
+	]
+}

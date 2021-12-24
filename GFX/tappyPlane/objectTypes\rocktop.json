@@ -1,0 +1,50 @@
+{
+	"name": "rockTop",
+	"plugin-id": "Sprite",
+	"sid": 2061431210293616,
+	"isGlobal": false,
+	"instanceVariables": [],
+	"behaviorTypes": [],
+	"effectTypes": [],
+	"animations": {
+		"items": [
+			{
+				"frames": [
+					{
+						"width": 108,
+						"height": 239,
+						"originX": 0.5,
+						"originY": 0.502092,
+						"originalSource": "",
+						"exportFormat": "png",
+						"exportQuality": 0.8,
+						"imageSpriteId": 5,
+						"collisionPoly": {
+							"points": [
+								0.00925926,
+								0.0041841,
+								0.990741,
+								0.0041841,
+								0.629629,
+								1,
+								0.574074,
+								1,
+								0.342593,
+								0.497908
+							]
+						},
+						"duration": 1
+					}
+				],
+				"sid": 8122561108732201,
+				"name": "Default",
+				"isLooping": false,
+				"isPingPong": false,
+				"repeatCount": 1,
+				"repeatTo": 0,
+				"speed": 5
+			}
+		],
+		"subfolders": []
+	}
+}
