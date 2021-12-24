@@ -19,8 +19,8 @@ async fn main() {
        */
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, 320.0, 152.0));
 
-    let _width = 700;
-    let _height = 500;
+    let width = screen_width();
+    let height = screen_height();
 
     //Ajout tileset
     let tileset = Texture2D::from_file_with_format(
@@ -32,7 +32,7 @@ async fn main() {
         include_bytes!("../GFX/fishgame_assets/decorations1.png"),
         None,
     );
-    
+
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/fishgame_assets/map.json").await.unwrap();
 
@@ -50,34 +50,34 @@ async fn main() {
         None,
     );
 
-    //Ajout texture ennemie (142 x 148).
+    //Ajout texture ennemie (90 x 155).
     let ennemie = Texture2D::from_file_with_format(
         include_bytes!("../GFX/Enemies/spikeMan_stand.png"),
         None,
-     );
+    );
 
     let _ennemie2 = Texture2D::from_file_with_format(include_bytes!("../GFX/Enemies/sun1.png"),None,);
 
     loop {
-        clear_background(WHITE);
-
         //Choisir la caméra actif.
         set_camera(&camera);
+
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
             "main layer",
-            Rect::new(0.0, 0.0, screen_width(), screen_height()),
+            Rect::new(0.0, 0.0, width, height),
             None,
         );
+
         draw_texture_ex( 
             ennemie, 
             0.0, 
             0.0, 
             WHITE,
             DrawTextureParams {
-            source: Some(Rect::new(0.0, 0.0, 140., 142.)),
-            ..Default::default()
-        },
+                source: Some(Rect::new(0.0, 0.0, 90., 155.)),
+                ..Default::default()
+            },
         );
         next_frame().await
     }
