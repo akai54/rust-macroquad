@@ -49,12 +49,14 @@ async fn main() {
 
     //Ajout texture ennemie (142 x 148).
     let ennemie = Texture2D::from_file_with_format(
-        include_bytes!("../images/sun1.png"),
+        include_bytes!("../images/spikeMan.png"),
         None,
-    );
+     );
 
     let _width = 700;
     let _height = 500;
+    
+    let ennemie2 = Texture2D::from_file_with_format(include_bytes!("../images/sun1.png"),None,);
 
     loop {
         clear_background(WHITE);
@@ -68,7 +70,17 @@ async fn main() {
             0.0, 
             WHITE,
             DrawTextureParams {
-                source: Some(Rect::new(0.0, 0.0, 142., 148.)),
+            source: Some(Rect::new(0.0, 0.0, 140., 142.)),
+            ..Default::default()
+        },
+        );
+        draw_texture_ex(
+            ennemie2,
+            0.0,
+            0.0,
+            WHITE,
+            DrawTextureParams {
+                source: Some(Rect::new(-40.0, 30.0, 140., 142.)),
                 ..Default::default()
             },
         );
