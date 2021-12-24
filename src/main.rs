@@ -19,6 +19,9 @@ async fn main() {
        */
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, 320.0, 152.0));
 
+    let _width = 700;
+    let _height = 500;
+
     //Ajout tileset
     let tileset = Texture2D::from_file_with_format(
         include_bytes!("../Tilemap/tileset.png"),
@@ -53,8 +56,6 @@ async fn main() {
         None,
      );
 
-    let _width = 700;
-    let _height = 500;
     
     let ennemie2 = Texture2D::from_file_with_format(include_bytes!("../images/sun1.png"),None,);
 
