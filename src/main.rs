@@ -24,25 +24,25 @@ async fn main() {
 
     //Ajout tileset
     let tileset = Texture2D::from_file_with_format(
-        include_bytes!("../Tilemap/tileset.png"),
+        include_bytes!("../GFX/fishgame_assets/tileset.png"),
         None,
     );
 
-    let portal = Texture2D::from_file_with_format(
-        include_bytes!("../GFX/Items/portal_yellow.png"),
+    let decorations = Texture2D::from_file_with_format(
+        include_bytes!("../GFX/fishgame_assets/decorations1.png"),
         None,
     );
-
+    
     //Charger le fichier json de la map.
-    let tiled_map_json = load_string("../Tilemap/map.json").await.unwrap();
+    let tiled_map_json = load_string("GFX/fishgame_assets/map.json").await.unwrap();
 
     let tiled_map = tiled::load_map(
         &tiled_map_json,
         &[ 
         ("tileset.png", tileset), 
-        ("portal_yellow.png", portal),],
+        ("decorations1.png", decorations),],
         &[],
-    );
+    ).unwrap();
 
     //Ajout texture Personnage (120 x 201).
     let _bunny = Texture2D::from_file_with_format(
@@ -52,19 +52,23 @@ async fn main() {
 
     //Ajout texture ennemie (142 x 148).
     let ennemie = Texture2D::from_file_with_format(
-        include_bytes!("../images/spikeMan.png"),
+        include_bytes!("../GFX/Enemies/spikeMan_stand.png"),
         None,
      );
 
-    
-    let ennemie2 = Texture2D::from_file_with_format(include_bytes!("../images/sun1.png"),None,);
+    let _ennemie2 = Texture2D::from_file_with_format(include_bytes!("../GFX/Enemies/sun1.png"),None,);
 
     loop {
         clear_background(WHITE);
 
         //Choisir la caméra actif.
         set_camera(&camera);
-
+        tiled_map.draw_tiles(
+            // The name of the layer in assets/map.json
+            "main layer",
+            Rect::new(0.0, 0.0, screen_width(), screen_height()),
+            None,
+        );
         draw_texture_ex( 
             ennemie, 
             0.0, 
@@ -74,16 +78,6 @@ async fn main() {
             source: Some(Rect::new(0.0, 0.0, 140., 142.)),
             ..Default::default()
         },
-        );
-        draw_texture_ex(
-            ennemie2,
-            0.0,
-            0.0,
-            WHITE,
-            DrawTextureParams {
-                source: Some(Rect::new(-40.0, 30.0, 140., 142.)),
-                ..Default::default()
-            },
         );
         next_frame().await
     }
