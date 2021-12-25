@@ -1,0 +1,14 @@
+{ "columns":20,
+ "image":"..\/Seasonal Tilesets\/2 - Autumn Forest\/Autumn_entities (16 x 16).png",
+ "imageheight":112,
+ "imagewidth":320,
+ "margin":0,
+ "name":"Autumn_entities (16 x 16)",
+ "spacing":0,
+ "tilecount":140,
+ "tiledversion":"1.7.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.6"
+}
