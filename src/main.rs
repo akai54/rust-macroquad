@@ -30,12 +30,11 @@ async fn main() {
 
     //Sets the FilterMode of this texture.
     tileset.set_filter(FilterMode::Nearest);
-    
+
     let decorations = Texture2D::from_file_with_format(
         include_bytes!("../GFX/fishgame_assets/decorations1.png"),
         None,
-    );
-    decorations.set_filter(FilterMode::Nearest);
+    );decorations.set_filter(FilterMode::Nearest);
 
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/fishgame_assets/map.json").await.unwrap();
@@ -48,23 +47,15 @@ async fn main() {
         &[],
     ).unwrap();
 
-    //Ajout texture Personnage (120 x 201).
+    //Ajout texture Personnage (32 x 51).
     let bunny = Texture2D::from_file_with_format(
-        include_bytes!("../GFX/Players/bunny1_ready.png"), 
+        include_bytes!("../GFX/Players/resized/bunny1_ready.png"), 
         None,
-    );
+    );bunny.set_filter(FilterMode::Nearest);
 
-    bunny.set_filter(FilterMode::Nearest);
-    
-    //Ajout texture ennemie (90 x 155).
-    let ennemie = Texture2D::from_file_with_format(
-        include_bytes!("../GFX/Enemies/spikeMan_stand.png"),
-        None,
-    );
+    //Ajout de la position de bunny.
+    let mut bunny_pos = vec2(200., 100.);
 
-    ennemie.set_filter(FilterMode::Nearest);
-
-    let _ennemie2 = Texture2D::from_file_with_format(include_bytes!("../GFX/Enemies/sun1.png"),None,);
 
     loop {
         clear_background(BLACK);
@@ -80,15 +71,37 @@ async fn main() {
         );
 
         draw_texture_ex( 
-            ennemie, 
+            bunny, 
             0.0, 
             0.0, 
             WHITE,
             DrawTextureParams {
-                source: Some(Rect::new(0.0, 0.0, 90., 155.)),
+                source: Some(Rect::new(0.0, 0.0, 32., 51.)),
                 ..Default::default()
             },
+        ); 
+
+        //Condition de touche pour bouger bunny.
+        if is_key_down(KeyCode::D) {
+            bunny_pos.x += 100.0;
+        }
+        if is_key_down(KeyCode::A) {
+            bunny_pos.x -= 100.0;
+        }
+
+        let bunny_bottom_point = vec2(bunny_pos.x + 32. / 2., bunny_pos.y + 51.);
+
+        let bunny_tile = vec2(
+            bunny_bottom_point.x / width * tiled_map.raw_tiled_map.width as f32,
+            bunny_bottom_point.y / height * tiled_map.raw_tiled_map.height as f32,
         );
+
+        if tiled_map
+            .get_tile("main layer", bunny_tile.x as u32, bunny_tile.y as u32)
+                .is_none()
+        {
+            bunny_pos.y += 20.0;
+        }
         next_frame().await
     }
 }
