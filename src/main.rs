@@ -22,6 +22,13 @@ async fn main() {
     let width = 700.;
     let height = 500.;
 
+    pub enum Keycode {
+        Right,
+        Left,
+        Up,
+        Down
+    }
+
     //Ajout tileset
     let tileset = Texture2D::from_file_with_format(
         include_bytes!("../GFX/fishgame_assets/tileset.png"),
@@ -55,6 +62,7 @@ async fn main() {
 
     //Ajout de la position de bunny.
     let mut bunny_pos = vec2(200., 100.);
+    
 
 
     loop {
@@ -82,14 +90,17 @@ async fn main() {
         ); 
 
         //Condition de touche pour bouger bunny.
-        if is_key_down(KeyCode::D) {
-            bunny_pos.x += 100.0;
+       /* if is_key_pressed(key_code: KeyCode) {
+            True 
+        } */
+        if is_key_down(KeyCode::Right) {
+            bunny_pos.x += 1.0;
         }
-        if is_key_down(KeyCode::A) {
-            bunny_pos.x -= 100.0;
+        if is_key_down(KeyCode::Left) {
+            bunny_pos.x -= 1.0;
         }
-
-        let bunny_bottom_point = vec2(bunny_pos.x + 32. / 2., bunny_pos.y + 51.);
+    
+        let bunny_bottom_point = vec2(bunny_pos.x + 76. / 2., bunny_pos.y + 66.);
 
         let bunny_tile = vec2(
             bunny_bottom_point.x / width * tiled_map.raw_tiled_map.width as f32,
