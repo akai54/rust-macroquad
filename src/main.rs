@@ -21,13 +21,6 @@ async fn main() {
     let width = 700.;
     let height = 500.;
 
-    pub enum Keycode {
-        Right,
-        Left,
-        Up,
-        Down,
-    }
-
     //Ajout tileset
     let tileset = Texture2D::from_file_with_format(
         include_bytes!("../GFX/fishgame_assets/tileset.png"),
@@ -76,13 +69,12 @@ async fn main() {
             None,
         );
 
-        draw_texture_ex( 
-            bunny, 
-            bunny_pos.x, 
-            bunny_pos.y, 
+        draw_texture_ex(
+            bunny,
+            bunny_pos.x,
+            bunny_pos.y,
             WHITE,
             DrawTextureParams {
-                dest_size: Some(Vec2:: bunny_pos),
                 source: Some(Rect::new(0.0, 0.0, 32., 51.)),
                 ..Default::default()
             },
@@ -90,13 +82,13 @@ async fn main() {
 
         //Condition de touche pour bouger bunny.
         if is_key_pressed(KeyCode::Right) {
-            bunny_pos.x += 10.0;
+            bunny_pos.x += 5.0;
         }
         if is_key_pressed(KeyCode::Left) {
-            bunny_pos.x -= 10.0;
+            bunny_pos.x -= 5.0;
         }
 
-        let bunny_bottom_point = vec2(bunny_pos.x + 76. / 2., bunny_pos.y + 66.);
+        let bunny_bottom_point = vec2(bunny_pos.x + 32. / 2., bunny_pos.y + 51.);
 
         let bunny_tile = vec2(
             bunny_bottom_point.x / width * tiled_map.raw_tiled_map.width as f32,
@@ -107,7 +99,7 @@ async fn main() {
             .get_tile("main layer", bunny_tile.x as u32, bunny_tile.y as u32)
             .is_none()
         {
-            bunny_pos.y += 10.0;
+            bunny_pos.y += 3.0;
         }
         next_frame().await
     }
