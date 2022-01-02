@@ -72,8 +72,8 @@ async fn main() {
 
         draw_texture_ex( 
             bunny, 
-            0.0, 
-            0.0, 
+            bunny_pos.x, 
+            bunny_pos.y, 
             WHITE,
             DrawTextureParams {
                 source: Some(Rect::new(0.0, 0.0, 32., 51.)),
@@ -82,11 +82,11 @@ async fn main() {
         ); 
 
         //Condition de touche pour bouger bunny.
-        if is_key_down(KeyCode::D) {
-            bunny_pos.x += 100.0;
+        if is_key_pressed(KeyCode::Right) {
+            bunny_pos.x += 10.0;
         }
-        if is_key_down(KeyCode::A) {
-            bunny_pos.x -= 100.0;
+        if is_key_pressed(KeyCode::Left) {
+            bunny_pos.x -= 10.0;
         }
 
         let bunny_bottom_point = vec2(bunny_pos.x + 32. / 2., bunny_pos.y + 51.);
@@ -100,7 +100,7 @@ async fn main() {
             .get_tile("main layer", bunny_tile.x as u32, bunny_tile.y as u32)
                 .is_none()
         {
-            bunny_pos.y += 20.0;
+            bunny_pos.y += 10.0;
         }
         next_frame().await
     }
