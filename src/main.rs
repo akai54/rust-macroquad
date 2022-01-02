@@ -3,6 +3,12 @@ use macroquad::prelude::*;
 
 use macroquad_tiled as tiled;
 
+use macroquad_platformer::*;
+
+struct Joueur {
+    collider: Actor,
+    speed: Vec2,
+}
 #[macroquad::main("Platformer")]
 async fn main() {
     /* Explications Camera2D. (Par Ordre).
@@ -46,6 +52,25 @@ async fn main() {
     )
     .unwrap();
 
+    let mut collisions_statique = vec![];
+    for (_x, _y, tile) in tiled_map.tiles("main layer", None) {
+        collisions_statique.push(tile.is_some());
+    }
+
+    let mut monde = World::new();
+    monde.add_static_tiled_layer(
+        collisions_statique,
+        tiled_map.raw_tiled_map.tilewidth as f32,
+        tiled_map.raw_tiled_map.tileheight as f32,
+        tiled_map.raw_tiled_map.width as _,
+        1,
+    );
+    
+    let mut joueur = Joueur {
+        collider: monde.add_actor(vec2(200.0, 100.0), 36, 66),
+        speed: vec2(0., 0.),
+    };
+    
     //Ajout texture Personnage (32 x 51).
     let bunny = Texture2D::from_file_with_format(
         include_bytes!("../GFX/Players/resized/bunny1_ready.png"),

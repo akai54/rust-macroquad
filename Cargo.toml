@@ -8,3 +8,4 @@ edition = "2018"
 [dependencies]
 macroquad = "0.3"
 macroquad-tiled = "0.1"
+macroquad-platformer = "0.1"

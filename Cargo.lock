@@ -165,6 +165,7 @@ name = "jeu"
 version = "0.1.0"
 dependencies = [
  "macroquad",
+ "macroquad-platformer",
  "macroquad-tiled",
 ]
 
@@ -199,6 +200,15 @@ dependencies = [
  "miniquad",
  "quad-rand",
  "quad-snd",
+]
+
+[[package]]
+name = "macroquad-platformer"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a912b373a1edc678242e262010d58e3e7e7977bf00227d5343dd9e641d52fa2"
+dependencies = [
+ "macroquad",
 ]
 
 [[package]]
