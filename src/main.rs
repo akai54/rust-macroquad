@@ -138,13 +138,13 @@ async fn main() {
 
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
-           joueur.vitesse.x = 5.; 
+           joueur.vitesse.x = consts::VITESSE_MOUV;
         }
-        if is_key_down(KeyCode::Left) {
-           
+        else if is_key_down(KeyCode::Left) {
+           joueur.vitesse.x = - consts::VITESSE_MOUV;
         }
-        if is_key_down(KeyCode::Up){
-          
+        else{
+           joueur.vitesse.x = 0.;
         }
 
         next_frame().await
