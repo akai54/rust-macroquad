@@ -9,19 +9,20 @@ struct Joueur {
     collider: Actor,
     speed: Vec2,
 }
+
 #[macroquad::main("Platformer")]
 async fn main() {
     /* Explications Camera2D. (Par Ordre).
-    Rotation in degrees
-    zoom: Vec2
-    target: Vec2
-    Rotation and zoom origin
-    offset: Vec2
-    Displacement from target
-    render_target: Option<RenderTarget>
-    If “render_target” is set - camera will render to texture otherwise to the screen
-    viewport: Option<(i32, i32, i32, i32)>
-    */
+       Rotation in degrees
+       zoom: Vec2
+       target: Vec2
+       Rotation and zoom origin
+       offset: Vec2
+       Displacement from target
+       render_target: Option<RenderTarget>
+       If “render_target” is set - camera will render to texture otherwise to the screen
+       viewport: Option<(i32, i32, i32, i32)>
+       */
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(), screen_height()));
 
     let width = 700.;
@@ -50,34 +51,15 @@ async fn main() {
         &[("tileset.png", tileset), ("decorations1.png", decorations)],
         &[],
     )
-    .unwrap();
+        .unwrap();
 
-    let mut collisions_statique = vec![];
-    for (_x, _y, tile) in tiled_map.tiles("main layer", None) {
-        collisions_statique.push(tile.is_some());
-    }
-
-    let mut monde = World::new();
-    monde.add_static_tiled_layer(
-        collisions_statique,
-        tiled_map.raw_tiled_map.tilewidth as f32,
-        tiled_map.raw_tiled_map.tileheight as f32,
-        tiled_map.raw_tiled_map.width as _,
-        1,
-    );
-    
-    let mut joueur = Joueur {
-        collider: monde.add_actor(vec2(200.0, 100.0), 36, 66),
-        speed: vec2(0., 0.),
-    };
-    
     //Ajout texture Personnage (32 x 51).
     let bunny = Texture2D::from_file_with_format(
         include_bytes!("../GFX/Players/resized/bunny1_ready.png"),
         None,
     );
     bunny.set_filter(FilterMode::Nearest);
-
+    
     //Ajout de la position de bunny.
     let mut bunny_pos = vec2(200., 100.);
 
@@ -94,6 +76,7 @@ async fn main() {
             None,
         );
 
+
         draw_texture_ex(
             bunny,
             bunny_pos.x,
@@ -106,12 +89,16 @@ async fn main() {
         );
 
         //Condition de touche pour bouger bunny.
-        if is_key_pressed(KeyCode::Right) {
+        if is_key_down(KeyCode::Right) {
             bunny_pos.x += 5.0;
         }
-        if is_key_pressed(KeyCode::Left) {
+        if is_key_down(KeyCode::Left) {
             bunny_pos.x -= 5.0;
         }
+        if is_key_down(KeyCode::Up){
+            bunny_pos.y -= 3.0;
+        }
+        
 
         let bunny_bottom_point = vec2(bunny_pos.x + 32. / 2., bunny_pos.y + 51.);
 
@@ -122,7 +109,7 @@ async fn main() {
 
         if tiled_map
             .get_tile("main layer", bunny_tile.x as u32, bunny_tile.y as u32)
-            .is_none()
+                .is_none()
         {
             bunny_pos.y += 3.0;
         }
