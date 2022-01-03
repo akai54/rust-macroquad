@@ -17,6 +17,13 @@ struct Joueur {
     vitesse: Vec2,
 }
 
+//Les constants du jeu.
+mod consts {
+    pub const VITESSE_SAUT: f32 = -700.0;
+    pub const GRAVITE: f32 = 2000.0;
+    pub const VITESSE_MOUV: f32 = 300.0;
+}
+
 #[macroquad::main("Platformer")]
 async fn main() {
     /* Explications Camera2D. (Par Ordre).
@@ -31,9 +38,6 @@ async fn main() {
        viewport: Option<(i32, i32, i32, i32)>
        */
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(), screen_height()));
-
-    let width = 700.;
-    let height = 500.;
 
     //Ajout tileset
     let tileset = Texture2D::from_file_with_format(
@@ -81,13 +85,23 @@ async fn main() {
     //on leur connait grace à la taille des tuiles en pixel de la tilemap.
     //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
     //l'étiquette.
-    monde.add_static_tiled_layer(collisions_statiques, 32., 32., tiled_map.raw_tiled_map.width as _, 1);
+    monde.add_static_tiled_layer( 
+        collisions_statiques, 
+        tiled_map.raw_tiled_map.tilewidth as f32, 
+        tiled_map.raw_tiled_map.tileheight as f32, 
+        tiled_map.raw_tiled_map.width as _, 
+        1,
+        );
 
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let mut joueur = Joueur {
-        collider: monde.add_actor(vec2(50.0, 80.0), 8, 8),
+        //En ce qui concerne les collision, le joueur est un acteur et non pas un objet statique.
+        collider: monde.add_actor(vec2(200.0, 100.0), 36, 36),
         vitesse: vec2(0., 0.),
     };
+
+    let width = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
+    let height = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
     //Ajout texture Personnage (32 x 51).
     let bunny = Texture2D::from_file_with_format(
@@ -95,9 +109,6 @@ async fn main() {
         None,
     );
     bunny.set_filter(FilterMode::Nearest);
-
-    //Ajout de la position de bunny.
-    let mut bunny_pos = vec2(200., 100.);
 
     loop {
         clear_background(BLACK);
@@ -112,7 +123,8 @@ async fn main() {
             None,
         );
 
-
+        let bunny_pos = monde.actor_pos(joueur.collider);
+        
         draw_texture_ex(
             bunny,
             bunny_pos.x,
@@ -126,29 +138,15 @@ async fn main() {
 
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
-            bunny_pos.x += 5.0;
+           joueur.vitesse.x = 5.; 
         }
         if is_key_down(KeyCode::Left) {
-            bunny_pos.x -= 5.0;
+           
         }
         if is_key_down(KeyCode::Up){
-            bunny_pos.y -= 3.0;
+          
         }
 
-
-        let bunny_bottom_point = vec2(bunny_pos.x + 32. / 2., bunny_pos.y + 51.);
-
-        let bunny_tile = vec2(
-            bunny_bottom_point.x / width * tiled_map.raw_tiled_map.width as f32,
-            bunny_bottom_point.y / height * tiled_map.raw_tiled_map.height as f32,
-        );
-
-        if tiled_map
-            .get_tile("main layer", bunny_tile.x as u32, bunny_tile.y as u32)
-                .is_none()
-        {
-            bunny_pos.y += 3.0;
-        }
         next_frame().await
     }
 }
