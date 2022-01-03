@@ -14,7 +14,7 @@ use macroquad_platformer::*;
 //Structure pour le joueur, qui contient la vitesse ainsi que son type de collision.
 struct Joueur {
     collider: Actor,
-    speed: Vec2,
+    vitesse: Vec2,
 }
 
 #[macroquad::main("Platformer")]
@@ -82,6 +82,12 @@ async fn main() {
     //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
     //l'étiquette.
     monde.add_static_tiled_layer(collisions_statiques, 8., 8., 40, 1);
+
+    //Ajout du variable joueur, qui utilise la struct Joueur.
+    let mut joueur = Joueur {
+        collider: monde.add_actor(vec2(50.0, 80.0), 8, 8),
+        vitesse: vec2(0., 0.),
+    };
 
     //Ajout texture Personnage (32 x 51).
     let bunny = Texture2D::from_file_with_format(
