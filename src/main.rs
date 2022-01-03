@@ -81,7 +81,7 @@ async fn main() {
     //on leur connait grace à la taille des tuiles en pixel de la tilemap.
     //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
     //l'étiquette.
-    monde.add_static_tiled_layer(collisions_statiques, 8., 8., 40, 1);
+    monde.add_static_tiled_layer(collisions_statiques, 32., 32., tiled_map.raw_tiled_map.width as _, 1);
 
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let mut joueur = Joueur {
