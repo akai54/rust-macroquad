@@ -5,6 +5,13 @@ use macroquad_tiled as tiled;
 
 use macroquad_platformer::*;
 
+//Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique,
+//dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
+//préciser certaines informations pour que cela fonctionne.
+//Ce système est basé sur l'article suivant: https://maddythorson.medium.com/celeste-and-towerfall-physics-d24bd2ae0fc5
+//écrit par Maddy thorson pour les jeux qu'il a devloppé.
+
+//Structure pour le joueur, qui contient la vitesse ainsi que son type de collision.
 struct Joueur {
     collider: Actor,
     speed: Vec2,
@@ -53,13 +60,36 @@ async fn main() {
     )
         .unwrap();
 
+    //Les tuiles statiques, sont sauvegardé dans un vecteur.
+    let mut collisions_statiques = vec![];
+    
+    //Dans cette boucle nous allons ajouter tout les tuiles, qui sont dans la tilemap déja dans le
+    //vecteur collisions_statiques, donc soit c'est solide comme tuile soit il n'y a rien.
+    for (_x, _y, tile) in tiled_map.tiles("main layer", None) {
+        collisions_statiques.push(if tile.is_some() {
+            Tile::Solid
+        } else {
+            Tile::Empty
+        });
+    }
+
+    //Donc ici on créer notre monde, avec la structure World, déjà implemnté dans
+    //macroquad_platformer.
+    let mut monde = World::new();
+
+    //Ici on ajoute les tuiles qui sont statiques,
+    //on leur connait grace à la taille des tuiles en pixel de la tilemap.
+    //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
+    //l'étiquette.
+    monde.add_static_tiled_layer(collisions_statiques, 8., 8., 40, 1);
+
     //Ajout texture Personnage (32 x 51).
     let bunny = Texture2D::from_file_with_format(
         include_bytes!("../GFX/Players/resized/bunny1_ready.png"),
         None,
     );
     bunny.set_filter(FilterMode::Nearest);
-    
+
     //Ajout de la position de bunny.
     let mut bunny_pos = vec2(200., 100.);
 
@@ -98,7 +128,7 @@ async fn main() {
         if is_key_down(KeyCode::Up){
             bunny_pos.y -= 3.0;
         }
-        
+
 
         let bunny_bottom_point = vec2(bunny_pos.x + 32. / 2., bunny_pos.y + 51.);
 
