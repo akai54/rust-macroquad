@@ -1,3 +1,5 @@
+use std::ops::Not;
+
 // Utilisation des bibliotheques necessaires.
 use macroquad::prelude::*;
 
@@ -100,8 +102,8 @@ async fn main() {
         vitesse: vec2(0., 0.),
     };
 
-    let width = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
-    let height = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
+    let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
+    let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
     //Ajout texture Personnage (32 x 51).
     let bunny = Texture2D::from_file_with_format(
@@ -119,11 +121,15 @@ async fn main() {
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
             "main layer",
-            Rect::new(0.0, 0.0, width, height),
+            Rect::new(0.0, 0.0, largeur, longeur),
             None,
         );
 
+        //Contient la position de Bunny.
         let bunny_pos = monde.actor_pos(joueur.collider);
+
+        //Un bool qui indique si Bunny est sur le sol ou pas.
+        let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
         
         draw_texture_ex(
             bunny,
@@ -136,17 +142,34 @@ async fn main() {
             },
         );
 
+        //Si bunny n'est pas sur le sol, alors sa vitesse sera de:
+        if sur_le_sol == false{
+            joueur.vitesse.y += consts::GRAVITE * get_frame_time();
+        }
+        
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
            joueur.vitesse.x = consts::VITESSE_MOUV;
         }
+
         else if is_key_down(KeyCode::Left) {
            joueur.vitesse.x = - consts::VITESSE_MOUV;
         }
+        
+        else if is_key_pressed(KeyCode::Space) {
+           if sur_le_sol{
+           joueur.vitesse.y = consts::VITESSE_SAUT;
+           } 
+        }
+
         else{
            joueur.vitesse.x = 0.;
         }
-
+        
+        //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
+        monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
+        monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
+        
         next_frame().await
     }
 }
