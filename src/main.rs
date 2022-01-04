@@ -7,6 +7,7 @@ use macroquad_platformer::*;
 
 use macroquad::experimental::{
     collections::storage,
+    scene::{Node, RefMut},
 };
 
 //Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique,
@@ -27,18 +28,37 @@ struct Ressources {
 }
 
 impl Joueur {
-//Les constants du jeu.
+    //Les constants du jeu.
     pub const VITESSE_SAUT: f32 = -700.0;
     pub const GRAVITE: f32 = 2000.0;
     pub const VITESSE_MOUV: f32 = 300.0;
 
     fn new() -> Joueur {
-        let mut resources = storage::get_mut::<Ressources>();
+        let mut ressources = storage::get_mut::<Ressources>();
 
         Joueur {
-            collider: resources.physique.add_actor(vec2(200.0, 100.0), 36, 66),
+            collider: ressources.physique.add_actor(vec2(200.0, 100.0), 36, 66),
             vitesse: vec2(0., 0.),
         }
+    }
+}
+
+impl Node for Joueur {
+    fn draw(node: RefMut<Self>) {
+        let ressources = storage::get_mut::<Ressources>();
+
+        let pos = ressources.physique.actor_pos(node.collider);
+
+        draw_texture_ex(
+            bunny,
+            bunny_pos.x,
+            bunny_pos.y,
+            WHITE,
+            DrawTextureParams {
+                source: Some(Rect::new(0.0, 0.0, 32., 51.)),
+                ..Default::default()
+            },
+        );
     }
 }
 
@@ -84,7 +104,7 @@ async fn main() {
 
     //Les tuiles statiques, sont sauvegardé dans un vecteur.
     let mut collisions_statiques = vec![];
-    
+
     //Dans cette boucle nous allons ajouter tout les tuiles, qui sont dans la tilemap déja dans le
     //vecteur collisions_statiques, donc soit c'est solide comme tuile soit il n'y a rien.
     for (_x, _y, tile) in tiled_map.tiles("main layer", None) {
@@ -109,7 +129,7 @@ async fn main() {
         tiled_map.raw_tiled_map.tileheight as f32, 
         tiled_map.raw_tiled_map.width as _, 
         1,
-        );
+    );
 
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let mut joueur = Joueur {
@@ -146,46 +166,35 @@ async fn main() {
 
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
-        
-        draw_texture_ex(
-            bunny,
-            bunny_pos.x,
-            bunny_pos.y,
-            WHITE,
-            DrawTextureParams {
-                source: Some(Rect::new(0.0, 0.0, 32., 51.)),
-                ..Default::default()
-            },
-        );
 
         //Si bunny n'est pas sur le sol, alors sa vitesse sera de:
         if sur_le_sol == false{
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
         }
-        
+
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
-           joueur.vitesse.x = consts::VITESSE_MOUV;
+            joueur.vitesse.x = consts::VITESSE_MOUV;
         }
 
         else if is_key_down(KeyCode::Left) {
-           joueur.vitesse.x = - consts::VITESSE_MOUV;
+            joueur.vitesse.x = - consts::VITESSE_MOUV;
         }
-        
+
         else if is_key_pressed(KeyCode::Space) {
-           if sur_le_sol{
-           joueur.vitesse.y = consts::VITESSE_SAUT;
-           } 
+            if sur_le_sol{
+                joueur.vitesse.y = consts::VITESSE_SAUT;
+            } 
         }
 
         else{
-           joueur.vitesse.x = 0.;
+            joueur.vitesse.x = 0.;
         }
-        
+
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
-        
+
         next_frame().await
     }
 }
