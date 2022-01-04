@@ -1,5 +1,3 @@
-use std::ops::Not;
-
 // Utilisation des bibliotheques necessaires.
 use macroquad::prelude::*;
 
@@ -17,6 +15,11 @@ use macroquad_platformer::*;
 struct Joueur {
     collider: Actor,
     vitesse: Vec2,
+}
+//Une structure qui contient tout les ressources utilisé dans le jeu.
+struct Ressources {
+    bunny: Texture2D,
+    physique: World,
 }
 
 //Les constants du jeu.
