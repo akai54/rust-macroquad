@@ -47,11 +47,11 @@ impl Node for Joueur {
     fn draw(node: RefMut<Self>) {
         let ressources = storage::get_mut::<Ressources>();
 
-        let pos = ressources.physique.actor_pos(node.collider);
+        let bunny_pos = ressources.physique.actor_pos(node.collider);
 
         draw_texture_ex(
-            bunny,
-            bunny_pos.x,
+            ressources.bunny,
+            bunny_pos.x - 20.,
             bunny_pos.y,
             WHITE,
             DrawTextureParams {
@@ -59,6 +59,47 @@ impl Node for Joueur {
                 ..Default::default()
             },
         );
+    }
+
+    fn update(mut node: RefMut<Self>){
+        //Donc ici on créer notre monde, avec la structure World, déjà implemnté dans
+        //macroquad_platformer.
+        let monde = &mut storage::get_mut::<Ressources>().physique;
+
+        //Contient la position de Bunny.
+        let bunny_pos = monde.actor_pos(node.collider);
+
+        //Un bool qui indique si Bunny est sur le sol ou pas.
+        let sur_le_sol = monde.collide_check(node.collider, bunny_pos + vec2(0., 1.));
+
+        //Si bunny n'est pas sur le sol, alors sa vitesse sera de:
+        if sur_le_sol == false{
+            node.vitesse.y += Self::GRAVITE * get_frame_time();
+        }
+
+        //Condition de touche pour bouger bunny.
+        if is_key_down(KeyCode::Right) {
+            node.vitesse.x = Self::VITESSE_MOUV;
+            println!("Moving right");
+        }
+
+        else if is_key_down(KeyCode::Left) {
+            node.vitesse.x = - Self::VITESSE_MOUV;
+        }
+
+        else if is_key_pressed(KeyCode::Space) {
+            if sur_le_sol{
+                node.vitesse.y = Self::VITESSE_SAUT;
+            } 
+        }
+
+        else {
+            node.vitesse.x = 0.;
+        }
+
+        //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
+        monde.move_h(node.collider, node.vitesse.x * get_frame_time());
+        monde.move_v(node.collider, node.vitesse.y * get_frame_time());
     }
 }
 
@@ -115,15 +156,13 @@ async fn main() {
         });
     }
 
-    //Donc ici on créer notre monde, avec la structure World, déjà implemnté dans
-    //macroquad_platformer.
-    let mut monde = World::new();
+    let mut physique = World::new();
 
     //Ici on ajoute les tuiles qui sont statiques,
     //on leur connait grace à la taille des tuiles en pixel de la tilemap.
     //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
     //l'étiquette.
-    monde.add_static_tiled_layer( 
+    physique.add_static_tiled_layer( 
         collisions_statiques, 
         tiled_map.raw_tiled_map.tilewidth as f32, 
         tiled_map.raw_tiled_map.tileheight as f32, 
@@ -131,22 +170,19 @@ async fn main() {
         1,
     );
 
+    //Ajout texture Personnage (32 x 51).
+    let bunny = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
+
+    let ressources = Ressources { bunny, physique };
+    storage::store(ressources);
+    
     //Ajout du variable joueur, qui utilise la struct Joueur.
-    let mut joueur = Joueur {
-        //En ce qui concerne les collision, le joueur est un acteur et non pas un objet statique.
-        collider: monde.add_actor(vec2(200.0, 100.0), 36, 36),
-        vitesse: vec2(0., 0.),
-    };
+    let joueur = Joueur::new();
+
+    scene::add_node(joueur);
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
-
-    //Ajout texture Personnage (32 x 51).
-    let bunny = Texture2D::from_file_with_format(
-        include_bytes!("../GFX/Players/resized/bunny1_ready.png"),
-        None,
-    );
-    bunny.set_filter(FilterMode::Nearest);
 
     loop {
         clear_background(BLACK);
@@ -161,40 +197,6 @@ async fn main() {
             None,
         );
 
-        //Contient la position de Bunny.
-        let bunny_pos = monde.actor_pos(joueur.collider);
-
-        //Un bool qui indique si Bunny est sur le sol ou pas.
-        let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
-
-        //Si bunny n'est pas sur le sol, alors sa vitesse sera de:
-        if sur_le_sol == false{
-            joueur.vitesse.y += consts::GRAVITE * get_frame_time();
-        }
-
-        //Condition de touche pour bouger bunny.
-        if is_key_down(KeyCode::Right) {
-            joueur.vitesse.x = consts::VITESSE_MOUV;
-        }
-
-        else if is_key_down(KeyCode::Left) {
-            joueur.vitesse.x = - consts::VITESSE_MOUV;
-        }
-
-        else if is_key_pressed(KeyCode::Space) {
-            if sur_le_sol{
-                joueur.vitesse.y = consts::VITESSE_SAUT;
-            } 
-        }
-
-        else{
-            joueur.vitesse.x = 0.;
-        }
-
-        //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
-        monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
-        monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
-
-        next_frame().await
+        next_frame().await;
     }
 }
