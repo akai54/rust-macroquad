@@ -5,6 +5,10 @@ use macroquad_tiled as tiled;
 
 use macroquad_platformer::*;
 
+use macroquad::experimental::{
+    collections::storage,
+};
+
 //Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique,
 //dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
 //préciser certaines informations pour que cela fonctionne.
@@ -22,11 +26,20 @@ struct Ressources {
     physique: World,
 }
 
+impl Joueur {
 //Les constants du jeu.
-mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
     pub const GRAVITE: f32 = 2000.0;
     pub const VITESSE_MOUV: f32 = 300.0;
+
+    fn new() -> Joueur {
+        let mut resources = storage::get_mut::<Ressources>();
+
+        Joueur {
+            collider: resources.physique.add_actor(vec2(200.0, 100.0), 36, 66),
+            vitesse: vec2(0., 0.),
+        }
+    }
 }
 
 #[macroquad::main("Platformer")]
