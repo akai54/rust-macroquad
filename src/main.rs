@@ -16,6 +16,16 @@ use macroquad::experimental::{
 //Ce système est basé sur l'article suivant: https://maddythorson.medium.com/celeste-and-towerfall-physics-d24bd2ae0fc5
 //écrit par Maddy thorson pour les jeux qu'il a devloppé.
 
+// Structure pour l'ennemi, qui contient sa vitesse et son type de collision.
+struct Ennemi {
+    collider: Actor,
+    vitesse: Vec2,
+}
+//Une structure qui contient tout les ressources utilisé dans le jeu.
+struct Resennemi {
+    ennemi: Texture2D,
+    physique: World,
+}
 //Structure pour le joueur, qui contient la vitesse ainsi que son type de collision.
 struct Joueur {
     collider: Actor,
@@ -37,7 +47,15 @@ impl Joueur {
         let mut ressources = storage::get_mut::<Ressources>();
 
         Joueur {
-            collider: ressources.physique.add_actor(vec2(200.0, 100.0), 36, 66),
+            collider: ressources.physique.add_actor(vec2(200.0, 100.0), 32, 51),
+            vitesse: vec2(0., 0.),
+        }
+    }
+    fn new_ennemi() -> Ennemi {
+        let mut ressource_enn = storage::get_mut::<Resennemi>();
+
+        Ennemi {
+            collider: ressource_enn.physique.add_actor(vec2(150., 160.), 90, 155),
             vitesse: vec2(0., 0.),
         }
     }
@@ -51,10 +69,7 @@ impl Node for Joueur {
 
         let ressources = storage::get_mut::<Ressources>();
 
-        let mut bunny_pos = ressources.physique.actor_pos(node.collider);
-        //À cause d'un probleme de collision, j'ai du ajouter la valeur 15 à la position Y de
-        //bunny.
-        bunny_pos.y += 15.0;
+        let bunny_pos = ressources.physique.actor_pos(node.collider);
 
         draw_texture_ex(
             ressources.bunny,
@@ -130,6 +145,9 @@ async fn main() {
     let bunny = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
     bunny.set_filter(FilterMode::Nearest);
 
+    let ennemi = load_texture("GFX/Enemies/spikeMan_stand.png").await.unwrap();
+    ennemi.set_filter(FilterMode::Nearest);
+
     let decorations = load_texture("GFX/fishgame_assets/decorations1.png").await.unwrap();
     decorations.set_filter(FilterMode::Nearest);
 
@@ -170,8 +188,10 @@ async fn main() {
         1,
     );
 
-    let res = Ressources{bunny,physique};
-    storage::store(res);
+    //let ressource_enn = Resennemi{ennemi, physique};
+    //storage::store(ressource_enn);
+    let ressource_joueur = Ressources{bunny,physique};
+    storage::store(ressource_joueur);
     
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let joueur = Joueur::new();
