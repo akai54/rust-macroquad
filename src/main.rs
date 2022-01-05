@@ -21,9 +21,15 @@ struct Joueur {
     collider: Actor,
     vitesse: Vec2,
 }
+
+// Structure ennemie
+
+/*struct Ennemi;*/
+
 //Une structure qui contient tout les ressources utilisé dans le jeu.
 struct Ressources {
     bunny: Texture2D,
+    //robot: Texture2D,
     physique: World,
 }
 
@@ -43,6 +49,15 @@ impl Joueur {
     }
 }
 
+/*impl Ennemi {
+
+    fn robot_pos(&self) {
+        let mut robot:Vec2 = robot(16.0, 45.3);
+    }
+
+}
+*/
+
 impl Node for Joueur {
     fn draw(node: RefMut<Self>) {
         let ressources = storage::get_mut::<Ressources>();
@@ -61,7 +76,7 @@ impl Node for Joueur {
         );
     }
 
-    fn update(mut node: RefMut<Self>){
+    fn update(mut node: RefMut<Self>) {
         //Donc ici on créer notre monde, avec la structure World, déjà implemnté dans
         //macroquad_platformer.
         let monde = &mut storage::get_mut::<Ressources>().physique;
@@ -73,7 +88,7 @@ impl Node for Joueur {
         let sur_le_sol = monde.collide_check(node.collider, bunny_pos + vec2(0., 1.));
 
         //Si bunny n'est pas sur le sol, alors sa vitesse sera de:
-        if sur_le_sol == false{
+        if sur_le_sol == false {
             node.vitesse.y += Self::GRAVITE * get_frame_time();
         }
 
@@ -81,19 +96,15 @@ impl Node for Joueur {
         if is_key_down(KeyCode::Right) {
             node.vitesse.x = Self::VITESSE_MOUV;
             println!("Moving right");
-        }
-
-        else if is_key_down(KeyCode::Left) {
-            node.vitesse.x = - Self::VITESSE_MOUV;
-        }
-
-        else if is_key_pressed(KeyCode::Space) {
-            if sur_le_sol{
+        } else if is_key_down(KeyCode::Left) {
+            node.vitesse.x = -Self::VITESSE_MOUV;
+            println!("Moving left");
+        } else if is_key_pressed(KeyCode::Space) {
+            if sur_le_sol {
                 node.vitesse.y = Self::VITESSE_SAUT;
-            } 
-        }
-
-        else {
+                println!("Space");
+            }
+        } else {
             node.vitesse.x = 0.;
         }
 
@@ -106,16 +117,16 @@ impl Node for Joueur {
 #[macroquad::main("Platformer")]
 async fn main() {
     /* Explications Camera2D. (Par Ordre).
-       Rotation in degrees
-       zoom: Vec2
-       target: Vec2
-       Rotation and zoom origin
-       offset: Vec2
-       Displacement from target
-       render_target: Option<RenderTarget>
-       If “render_target” is set - camera will render to texture otherwise to the screen
-       viewport: Option<(i32, i32, i32, i32)>
-       */
+    Rotation in degrees
+    zoom: Vec2
+    target: Vec2
+    Rotation and zoom origin
+    offset: Vec2
+    Displacement from target
+    render_target: Option<RenderTarget>
+    If “render_target” is set - camera will render to texture otherwise to the screen
+    viewport: Option<(i32, i32, i32, i32)>
+    */
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(), screen_height()));
 
     //Ajout tileset
@@ -141,7 +152,7 @@ async fn main() {
         &[("tileset.png", tileset), ("decorations1.png", decorations)],
         &[],
     )
-        .unwrap();
+    .unwrap();
 
     //Les tuiles statiques, sont sauvegardé dans un vecteur.
     let mut collisions_statiques = vec![];
@@ -162,33 +173,54 @@ async fn main() {
     //on leur connait grace à la taille des tuiles en pixel de la tilemap.
     //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
     //l'étiquette.
-    physique.add_static_tiled_layer( 
-        collisions_statiques, 
-        tiled_map.raw_tiled_map.tilewidth as f32, 
-        tiled_map.raw_tiled_map.tileheight as f32, 
-        tiled_map.raw_tiled_map.width as _, 
+    physique.add_static_tiled_layer(
+        collisions_statiques,
+        tiled_map.raw_tiled_map.tilewidth as f32,
+        tiled_map.raw_tiled_map.tileheight as f32,
+        tiled_map.raw_tiled_map.width as _,
         1,
     );
 
     //Ajout texture Personnage (32 x 51).
     let bunny = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
+    // Ajout texture ennemie
+    let robot = Texture2D::from_file_with_format(include_bytes!("../GFX/Enemies/robot.png"),
+    None,);
+
+    let mut _robot_pos = vec2(0.0,0.0);
 
     let ressources = Ressources { bunny, physique };
     storage::store(ressources);
-    
+
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let joueur = Joueur::new();
 
     scene::add_node(joueur);
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
-    let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
+    let longeur = tiled_map.raw_tiled_map.tileheight as f32 * tiled_map.raw_tiled_map.height as f32;
 
     loop {
         clear_background(BLACK);
 
         //Choisir la caméra actif.
         set_camera(&camera);
+
+        /*draw_texture_ex(
+        robot,
+        0.0,
+        0.0,*/
+        draw_texture_ex(
+            robot,
+            70.2,
+            65.3,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(Vec2::new(23.3, 33.6)),
+                source: Some(Rect::new(0.0, 0.0, 42., 21.)),
+                ..Default::default()
+            },
+        );
 
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
