@@ -5,9 +5,10 @@ use macroquad_tiled as tiled;
 
 use macroquad_platformer::*;
 
+
 use macroquad::experimental::{
     collections::storage,
-    scene::{Node, RefMut},
+    scene::{Ennemi,RefMut},
 };
 
 //Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique,
@@ -17,23 +18,103 @@ use macroquad::experimental::{
 //écrit par Maddy thorson pour les jeux qu'il a devloppé.
 
 //Structure pour le joueur, qui contient la vitesse ainsi que son type de collision.
-struct Joueur {
+/*struct Joueur {
+    collider: Actor,
+    vitesse: Vec2,
+}*/
+
+// Structure ennemie
+
+struct Ennemi {
     collider: Actor,
     vitesse: Vec2,
 }
 
-// Structure ennemie
-
-/*struct Ennemi;*/
-
 //Une structure qui contient tout les ressources utilisé dans le jeu.
 struct Ressources {
-    bunny: Texture2D,
-    //robot: Texture2D,
+    //bunny: Texture2D,
+    robot: Texture2D,
     physique: World,
 }
 
-impl Joueur {
+trait Deplacement {
+    //fn ennemi(&self);
+    fn update(deplacement: RefMut<&Self>);
+    fn draw(deplacement: RefMut<&Self>);
+    const gravit: f32 = -700.0;
+    const mouvement: f32 = 300.0;
+
+    fn new()-> Ennemi {
+        let mut ressources = storage::get_mut::<Ressources>();
+
+        Ennemi {
+            collider: ressources.physique.add_actor(vec2(200.0, 100.0), 36,66),
+            vitesse: vec2(0., 0.),
+        }
+    }
+
+} 
+
+impl Deplacement for Ennemi {
+
+
+    fn draw(deplacement: RefMut<&Self>) {
+        let ressources = storage::get_mut::<Ressources>();
+
+        let robot_pos = ressources.physique.actor_pos(deplacement.collider); 
+        draw_texture_ex(
+            ressources.robot,
+            robot_pos.x - 20.,
+            robot_pos.y,
+            WHITE,
+            DrawTextureParams {
+                source: Some(Rect::new(0.0, 0.0, 32., 51.)),
+                ..Default::default()
+            },
+        );
+    }
+
+    fn update(mut deplacement: RefMut<&Self>) {
+        //Donc ici on créer notre monde, avec la structure World, déjà implemnté dans
+        //macroquad_platformer.
+        let monde = &mut storage::get_mut::<Ressources>().physique;
+
+        //Contient la position de Bunny.
+        let robot_pos = monde.actor_pos(deplacement.collider);
+
+        //Un bool qui indique si Bunny est sur le sol ou pas.
+        let sur_le_sol = monde.collide_check(deplacement.collider, robot_pos + vec2(0., 1.));
+
+        //Si bunny n'est pas sur le sol, alors sa vitesse sera de:
+        if sur_le_sol == false {
+            deplacement.vitesse.y += Self::gravit * get_frame_time();
+        }
+
+        //Condition de touche pour bouger bunny.
+        if is_key_down(KeyCode::Right) {
+            deplacement.vitesse.x = Self::mouvement;
+            println!("Moving right");
+        } else if is_key_down(KeyCode::Left) {
+            deplacement.vitesse.x = -Self::mouvement;
+            println!("Moving left");
+        } else if is_key_pressed(KeyCode::Space) {
+            if sur_le_sol {
+                deplacement.vitesse.y = Self::mouvement;
+                println!("Space");
+            }
+        } else {
+            deplacement.vitesse.x = 0.;
+        }
+
+        //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
+        monde.move_h(deplacement.collider, deplacement.vitesse.x * get_frame_time());
+        monde.move_v(deplacement.collider, deplacement.vitesse.y * get_frame_time());
+    }
+}
+
+
+
+/*impl Joueur {
     //Les constants du jeu.
     pub const VITESSE_SAUT: f32 = -700.0;
     pub const GRAVITE: f32 = 2000.0;
@@ -48,22 +129,29 @@ impl Joueur {
         }
     }
 }
-
+*/
 /*impl Ennemi {
+    pub const gravite: f32 = 2000.0;
+    pub const mouvement: f32 = 300.0;
 
-    fn robot_pos(&self) {
-        let mut robot:Vec2 = robot(16.0, 45.3);
+    fn new() -> Ennemi {
+        let mut ressources = storage::get_mut::<Ressources>();
+
+        Ennemi {
+            collider: ressources.physique.add_actor(vec2(300.0, 150.0), 75, 45),
+            vitesse: vec2(0., 0.),
+        }
     }
-
 }
 */
 
-impl Node for Joueur {
+
+
+/*impl Node for Joueur {
     fn draw(node: RefMut<Self>) {
         let ressources = storage::get_mut::<Ressources>();
 
-        let bunny_pos = ressources.physique.actor_pos(node.collider);
-
+        let bunny_pos = ressources.physique.actor_pos(node.collider); 
         draw_texture_ex(
             ressources.bunny,
             bunny_pos.x - 20.,
@@ -112,7 +200,60 @@ impl Node for Joueur {
         monde.move_h(node.collider, node.vitesse.x * get_frame_time());
         monde.move_v(node.collider, node.vitesse.y * get_frame_time());
     }
+}*/
+
+
+/*impl Joueur for Ennemi {
+    fn draw(node: RefMut<&Self>){
+        let ressources = storage::get_mut::<Ressources>();
+
+        let robot_pos = ressources.physique.actor_pos(node.collider);
+        draw_texture_ex(
+            ressources.robot,
+             robot_pos.x -20., 
+             robot_pos.y, 
+             WHITE, 
+             DrawTextureParams{
+                 source: Some(Rect::new(0.0, 0.0, 32., 51.)),
+                 ..Default::default()
+             },
+            
+            );
+    
+
+    fn udapte(mut node: RefMut<Self>) {
+        let monde = &mut storage::get_mut::<Ressources>().physique;
+
+        let robot_pos = monde.actor_pos(node.collider);
+
+        let sur_le_sol = monde.collide_check(node.collider, robot_pos + vec2(0., 1.));
+
+        if sur_le_sol == false {
+            node.vitesse.y += Self::GRAVITE * get_frame_time();
+        }
+
+        //Condition de touche pour bouger bunny.
+        if is_key_down(KeyCode::Right) {
+            node.vitesse.x = Self::VITESSE_MOUV;
+            println!("Moving right");
+        } else if is_key_down(KeyCode::Left) {
+            node.vitesse.x = -Self::VITESSE_MOUV;
+            println!("Moving left");
+        } else if is_key_pressed(KeyCode::Space) {
+            if sur_le_sol {
+                node.vitesse.y = Self::VITESSE_SAUT;
+                println!("Space");
+            }
+        } else {
+            node.vitesse.x = 0.;
+        }
+        monde.move_h(node.collider, node.vitesse.x * get_frame_time());
+        monde.move_v(node.collider, node.vitesse.y * get_frame_time());
+    }
 }
+}*/
+
+
 
 #[macroquad::main("Platformer")]
 async fn main() {
@@ -182,20 +323,19 @@ async fn main() {
     );
 
     //Ajout texture Personnage (32 x 51).
-    let bunny = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
+    //let bunny = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
     // Ajout texture ennemie
-    let robot = Texture2D::from_file_with_format(include_bytes!("../GFX/Enemies/robot.png"),
-    None,);
+    let robot = load_texture("GFX/Enemies/robot.png").await.unwrap();
 
-    let mut _robot_pos = vec2(0.0,0.0);
+    //let mut _robot_pos = vec2(0.0,0.0);
 
-    let ressources = Ressources { bunny, physique };
+    let ressources = Ressources {robot,physique };
     storage::store(ressources);
 
     //Ajout du variable joueur, qui utilise la struct Joueur.
-    let joueur = Joueur::new();
+    //let joueur = Joueur::new();
 
-    scene::add_node(joueur);
+    scene::add_node(Ennemi::new());
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32 * tiled_map.raw_tiled_map.height as f32;
@@ -209,11 +349,12 @@ async fn main() {
         /*draw_texture_ex(
         robot,
         0.0,
-        0.0,*/
+        0.0,
+        WHITE,*/
         draw_texture_ex(
             robot,
             70.2,
-            65.3,
+             65.3,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(Vec2::new(23.3, 33.6)),
@@ -221,7 +362,7 @@ async fn main() {
                 ..Default::default()
             },
         );
-
+    
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
             "main layer",
