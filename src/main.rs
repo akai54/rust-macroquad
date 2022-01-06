@@ -10,22 +10,12 @@ use macroquad::experimental::{
     scene::{Node, RefMut},
 };
 
-//Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique,
+//Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique_joueur,
 //dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
 //préciser certaines informations pour que cela fonctionne.
 //Ce système est basé sur l'article suivant: https://maddythorson.medium.com/celeste-and-towerfall-physics-d24bd2ae0fc5
 //écrit par Maddy thorson pour les jeux qu'il a devloppé.
 
-// Structure pour l'ennemi, qui contient sa vitesse et son type de collision.
-struct Ennemi {
-    collider: Actor,
-    vitesse: Vec2,
-}
-//Une structure qui contient tout les ressources utilisé dans le jeu.
-struct Resennemi {
-    ennemi: Texture2D,
-    physique: World,
-}
 //Structure pour le joueur, qui contient la vitesse ainsi que son type de collision.
 struct Joueur {
     collider: Actor,
@@ -34,7 +24,7 @@ struct Joueur {
 //Une structure qui contient tout les ressources utilisé dans le jeu.
 struct Ressources {
     bunny: Texture2D,
-    physique: World,
+    physique_joueur: World,
 }
 
 impl Joueur {
@@ -47,15 +37,7 @@ impl Joueur {
         let mut ressources = storage::get_mut::<Ressources>();
 
         Joueur {
-            collider: ressources.physique.add_actor(vec2(200.0, 100.0), 32, 51),
-            vitesse: vec2(0., 0.),
-        }
-    }
-    fn new_ennemi() -> Ennemi {
-        let mut ressource_enn = storage::get_mut::<Resennemi>();
-
-        Ennemi {
-            collider: ressource_enn.physique.add_actor(vec2(150., 160.), 90, 155),
+            collider: ressources.physique_joueur.add_actor(vec2(250.0, 100.0), 32, 51),
             vitesse: vec2(0., 0.),
         }
     }
@@ -69,7 +51,7 @@ impl Node for Joueur {
 
         let ressources = storage::get_mut::<Ressources>();
 
-        let bunny_pos = ressources.physique.actor_pos(node.collider);
+        let bunny_pos = ressources.physique_joueur.actor_pos(node.collider);
 
         draw_texture_ex(
             ressources.bunny,
@@ -88,7 +70,7 @@ impl Node for Joueur {
     fn update(mut node: RefMut<Self>){
         //Donc ici on créer notre monde, avec la structure World, déjà implemnté dans
         //macroquad_platformer.
-        let monde = &mut storage::get_mut::<Ressources>().physique;
+        let monde = &mut storage::get_mut::<Ressources>().physique_joueur;
 
         //Contient la position de Bunny.
         let bunny_pos = monde.actor_pos(node.collider);
@@ -96,13 +78,13 @@ impl Node for Joueur {
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(node.collider, bunny_pos + vec2(0., 1.));
 
+        println!("{}", bunny_pos);
+
         //Si bunny n'est pas sur le sol, alors sa vitesse sera de:
         if sur_le_sol == false{
             node.vitesse.y += Self::GRAVITE * get_frame_time();
         }
 
-        println!("{}", bunny_pos);
-        
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
             node.vitesse.x = Self::VITESSE_MOUV;
@@ -136,7 +118,7 @@ impl Node for Joueur {
 async fn main() {
 
     //Ajout tileset
-    let tileset = load_texture("GFX/fishgame_assets/tileset.png").await.unwrap();
+    let tileset = load_texture("GFX/TileMap/Terrain.png").await.unwrap();
 
     //Sets the FilterMode of this texture.
     tileset.set_filter(FilterMode::Nearest);
@@ -148,15 +130,15 @@ async fn main() {
     let ennemi = load_texture("GFX/Enemies/spikeMan_stand.png").await.unwrap();
     ennemi.set_filter(FilterMode::Nearest);
 
-    let decorations = load_texture("GFX/fishgame_assets/decorations1.png").await.unwrap();
-    decorations.set_filter(FilterMode::Nearest);
+    let all = load_texture("GFX/TileMap/all.png").await.unwrap();
+    all.set_filter(FilterMode::Nearest);
 
     //Charger le fichier json de la map.
-    let tiled_map_json = load_string("GFX/fishgame_assets/map.json").await.unwrap();
+    let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
 
     let tiled_map = tiled::load_map(
         &tiled_map_json,
-        &[("tileset.png", tileset), ("decorations1.png", decorations)],
+        &[("Terrain.png", tileset), ("all.png", all)],
         &[],
     )
         .unwrap();
@@ -174,35 +156,33 @@ async fn main() {
         });
     }
 
-    let mut physique = World::new();
+    let mut physique_joueur = World::new();
 
     //Ici on ajoute les tuiles qui sont statiques,
     //on leur connait grace à la taille des tuiles en pixel de la tilemap.
     //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
     //l'étiquette.
-    physique.add_static_tiled_layer( 
+    physique_joueur.add_static_tiled_layer( 
         collisions_statiques, 
         tiled_map.raw_tiled_map.tilewidth as f32, 
         tiled_map.raw_tiled_map.tileheight as f32, 
         tiled_map.raw_tiled_map.width as _, 
         1,
     );
-
-    //let ressource_enn = Resennemi{ennemi, physique};
-    //storage::store(ressource_enn);
-    let ressource_joueur = Ressources{bunny,physique};
+     
+    let ressource_joueur = Ressources{bunny,physique_joueur};
     storage::store(ressource_joueur);
     
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let joueur = Joueur::new();
-
+ 
     scene::add_node(joueur);
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
     loop {
-        clear_background(BLACK);
+        clear_background(WHITE);
 
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
