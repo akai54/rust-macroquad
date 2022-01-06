@@ -17,11 +17,6 @@ struct Joueur {
     vitesse: Vec2,
 }
 
-struct Platformer {
-    collider: Solid,
-    vitesse: f32,
-}
-
 //Les constants du jeu.
 mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
@@ -31,7 +26,7 @@ mod consts {
 #[macroquad::main("Platformer")]
 async fn main() {
     let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(), screen_height()));
-    
+
     //Ajout tileset
     let tileset = load_texture("GFX/TileMap/Terrain.png").await.unwrap();
 
@@ -113,7 +108,7 @@ async fn main() {
 
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
-        
+
         draw_texture_ex(
             bunny,
             bunny_pos.x,
@@ -129,30 +124,31 @@ async fn main() {
         if sur_le_sol == false{
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
         }
-        
+
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
-           joueur.vitesse.x = consts::VITESSE_MOUV;
+            joueur.vitesse.x = consts::VITESSE_MOUV;
         }
 
         else if is_key_down(KeyCode::Left) {
-           joueur.vitesse.x = - consts::VITESSE_MOUV;
+            joueur.vitesse.x = - consts::VITESSE_MOUV;
         }
-        
+
         else if is_key_pressed(KeyCode::Space) {
-           if sur_le_sol{
-           joueur.vitesse.y = consts::VITESSE_SAUT;
-           } 
+            if sur_le_sol{
+                joueur.vitesse.y = consts::VITESSE_SAUT;
+            } 
         }
 
         else{
-           joueur.vitesse.x = 0.;
+            joueur.vitesse.x = 0.;
         }
-        
+
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
-        
+
+        println!("{}", bunny_pos);
         next_frame().await;
     }
 }
