@@ -1,5 +1,5 @@
 // Utilisation des bibliotheques necessaires.
-use macroquad::prelude::*;
+use macroquad::{prelude::*, audio::*};
 
 use macroquad_tiled as tiled;
 
@@ -68,6 +68,8 @@ async fn main() {
     let bg = load_texture("GFX/TileMap/bg.png").await.unwrap();
     bg.set_filter(FilterMode::Nearest);
 
+    let son_bg = load_sound("SFX/Chiptune_Adventures_1.ogg").await.unwrap();
+
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
 
@@ -115,6 +117,12 @@ async fn main() {
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
+    play_sound(son_bg,  
+        PlaySoundParams { 
+            looped:true, 
+            volume:0.6,
+        }, 
+    );
     loop {
         clear_background(WHITE);
 
