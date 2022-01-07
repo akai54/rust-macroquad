@@ -52,13 +52,13 @@ async fn main() {
     bunny_jump.set_filter(FilterMode::Nearest);
 
     //Ajout texture Personnage (32 x 54).
-    let bunny_marche1 = load_texture("GFX/Players/bunny1_walk1.png").await.unwrap();
+    let bunny_marche1 = load_texture("GFX/Players/resized/bunny1_walk1.png").await.unwrap();
     bunny_marche1.set_filter(FilterMode::Nearest);
 
     //Ajout texture Personnage (32 x 55).
-    let bunny_marche2 = load_texture("GFX/Players/bunny1_walk2.png").await.unwrap();
+    let bunny_marche2 = load_texture("GFX/Players/resized/bunny1_walk2.png").await.unwrap();
     bunny_marche2.set_filter(FilterMode::Nearest);
-     
+
     let ennemi = load_texture("GFX/Enemies/spikeMan_stand.png").await.unwrap();
     ennemi.set_filter(FilterMode::Nearest);
 
@@ -116,13 +116,10 @@ async fn main() {
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
     loop {
-        //Contient la position de Bunny.
-        let bunny_pos = monde.actor_pos(joueur.collider);
+        clear_background(WHITE);
 
         set_camera(&camera);
         camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
-
-        clear_background(WHITE);
 
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
@@ -131,33 +128,54 @@ async fn main() {
             None,
         );
 
-
+        //Contient la position de Bunny.
+        let bunny_pos = monde.actor_pos(joueur.collider);
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
-
-        draw_texture_ex(
-            bunny_ready,
-            bunny_pos.x,
-            bunny_pos.y,
-            WHITE,
-            DrawTextureParams {
-                source: Some(Rect::new(0.0, 0.0, 32., 51.)),
-                ..Default::default()
-            },
-        );
 
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air sera de:
         if sur_le_sol == false{
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
+            draw_texture_ex(
+                bunny_jump,
+                bunny_pos.x,
+                bunny_pos.y,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, 32., 39.)),
+                    ..Default::default()
+                },
+            );
         }
 
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
             joueur.vitesse.x = consts::VITESSE_MOUV;
+            draw_texture_ex(
+                bunny_marche1,
+                bunny_pos.x,
+                bunny_pos.y,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, 32., 54.)),
+                    ..Default::default()
+                },
+            );
         }
 
         else if is_key_down(KeyCode::Left) {
             joueur.vitesse.x = - consts::VITESSE_MOUV;
+            draw_texture_ex(
+                bunny_marche1,
+                bunny_pos.x,
+                bunny_pos.y,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, 32., 54.)),
+                    flip_x: true,
+                    ..Default::default()
+                },
+            );
         }
 
         else if is_key_pressed(KeyCode::Space) {
@@ -168,6 +186,16 @@ async fn main() {
 
         else{
             joueur.vitesse.x = 0.;
+            draw_texture_ex(
+                bunny_stand,
+                bunny_pos.x,
+                bunny_pos.y,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, 32., 54.)),
+                    ..Default::default()
+                },
+            );
         }
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
