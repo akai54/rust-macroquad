@@ -27,6 +27,7 @@ mod consts {
 #[macroquad::main("Platformer")]
 async fn main() {
 
+    //nombre de vies de bunny.
     let mut nombre_vies = 3;
 
     //Choisir la caméra actif.
@@ -145,8 +146,10 @@ async fn main() {
         //Contient la position de Bunny.
         let bunny_pos = monde.actor_pos(joueur.collider);
 
+        //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
 
+        //Afficher fond d'écran.
         draw_texture_ex(
             bg,
             bunny_pos.x / 3.5,
@@ -157,6 +160,7 @@ async fn main() {
                 ..Default::default()
             },
         );
+        //Afficher les tuiles.
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
             "main-layer",
@@ -166,6 +170,34 @@ async fn main() {
 
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
+
+        //Un bool qui indique si Bunny est sur le spring ou pas.
+        let sur_spring = monde.collide_check(joueur.collider, bunny_pos + vec2(275., 500.));
+
+        if sur_spring == false {
+            //Afficher spring.
+            draw_texture_ex(spring,
+                275.,
+                500.,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, 32., 17.)),
+                    ..Default::default()
+                },
+            );
+        }
+
+        else if sur_spring == true {
+            draw_texture_ex(spring_out,
+                275.,
+                492.,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, 32., 24.)),
+                    ..Default::default()
+                },
+            );
+        }
 
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
         if sur_le_sol == false{
@@ -247,7 +279,7 @@ async fn main() {
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
 
-        println!("{}", bunny_pos);
+        println!("{} {}", sur_spring, get_fps());
         next_frame().await;
     }
 }
