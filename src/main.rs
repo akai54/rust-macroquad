@@ -121,6 +121,16 @@ async fn main() {
         set_camera(&camera);
         camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
 
+        draw_texture_ex(
+            bg,
+            0.,
+            0.,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), screen_height())),
+                ..Default::default()
+            },
+        );
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
             "main-layer",
@@ -132,6 +142,7 @@ async fn main() {
         let bunny_pos = monde.actor_pos(joueur.collider);
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
+
 
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air sera de:
         if sur_le_sol == false{
@@ -202,7 +213,6 @@ async fn main() {
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
 
-        println!("{}", bunny_pos);
         next_frame().await;
     }
 }
