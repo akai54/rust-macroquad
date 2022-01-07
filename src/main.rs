@@ -22,9 +22,12 @@ mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
     pub const GRAVITE: f32 = 2000.0;
     pub const VITESSE_MOUV: f32 = 300.0;
+    pub const LIMITE_MONDE: f32 = 20000.0;
 }
 #[macroquad::main("Platformer")]
 async fn main() {
+
+    let mut nombre_vies = 0;
 
     //Choisir la caméra actif.
     let mut camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
@@ -133,10 +136,12 @@ async fn main() {
         //Contient la position de Bunny.
         let bunny_pos = monde.actor_pos(joueur.collider);
 
+        camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
+
         draw_texture_ex(
             bg,
-            bunny_pos.x / 2.,
-            bunny_pos.y / 2.,
+            bunny_pos.x / 3.5,
+            bunny_pos.y / 3.5,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(screen_width(), screen_height())),
@@ -150,13 +155,10 @@ async fn main() {
             None,
         );
 
-
-        camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 2., bunny_pos.y / 2., screen_width(),screen_height()));
-
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
 
-        //Si bunny n'est pas sur le sol, alors sa vitesse en l'air sera de:
+        //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
         if sur_le_sol == false{
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
             draw_texture_ex(
@@ -169,7 +171,13 @@ async fn main() {
                     ..Default::default()
                 },
             );
+            //Si la position de bunny dépasse la limite du monde,
+            //alors le jeu prend fin.
+            if bunny_pos.y > consts::LIMITE_MONDE {
+                break;
+            }
         }
+
 
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
@@ -210,7 +218,6 @@ async fn main() {
                         volume:0.6,
                     }, 
                 );
-
             } 
         }
 
@@ -232,6 +239,7 @@ async fn main() {
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
 
+        println!("{}", bunny_pos);
         next_frame().await;
     }
 }
