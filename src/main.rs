@@ -22,12 +22,12 @@ mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
     pub const GRAVITE: f32 = 2000.0;
     pub const VITESSE_MOUV: f32 = 300.0;
-    pub const LIMITE_MONDE: f32 = 20000.0;
+    pub const LIMITE_MONDE: f32 = 15000.0;
 }
 #[macroquad::main("Platformer")]
 async fn main() {
 
-    let mut nombre_vies = 0;
+    let mut nombre_vies = 3;
 
     //Choisir la caméra actif.
     let mut camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
@@ -70,6 +70,15 @@ async fn main() {
 
     let bg = load_texture("GFX/TileMap/bg.png").await.unwrap();
     bg.set_filter(FilterMode::Nearest);
+
+    let spring = load_texture("GFX/Items/resized/spring.png").await.unwrap();
+    spring.set_filter(FilterMode::Nearest);
+
+    let spring_in = load_texture("GFX/Items/resized/spring_in.png").await.unwrap();
+    spring_in.set_filter(FilterMode::Nearest);
+
+    let spring_out = load_texture("GFX/Items/resized/spring_out.png").await.unwrap();
+    spring_out.set_filter(FilterMode::Nearest);
 
     let son_bg = load_sound("SFX/Chiptune_Adventures_1.ogg").await.unwrap();
 
@@ -177,7 +186,6 @@ async fn main() {
                 break;
             }
         }
-
 
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
