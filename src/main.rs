@@ -70,6 +70,8 @@ async fn main() {
 
     let son_bg = load_sound("SFX/Chiptune_Adventures_1.ogg").await.unwrap();
 
+    let son_saut = load_sound("SFX/jump1.ogg").await.unwrap();
+
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
 
@@ -201,6 +203,13 @@ async fn main() {
         else if is_key_pressed(KeyCode::Space) {
             if sur_le_sol{
                 joueur.vitesse.y = consts::VITESSE_SAUT;
+                play_sound(son_saut, 
+                    PlaySoundParams { 
+                        looped:false, 
+                        volume:0.6,
+                    }, 
+                );
+
             } 
         }
 
