@@ -25,7 +25,9 @@ mod consts {
 }
 #[macroquad::main("Platformer")]
 async fn main() {
-    let camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(), screen_height()));
+
+    //Choisir la caméra actif.
+    let mut camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
 
     //Ajout tileset
     let tileset = load_texture("GFX/TileMap/Terrain.png").await.unwrap();
@@ -34,21 +36,44 @@ async fn main() {
     tileset.set_filter(FilterMode::Nearest);
 
     //Ajout texture Personnage (32 x 51).
-    let bunny = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
-    bunny.set_filter(FilterMode::Nearest);
+    let bunny_ready = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
+    bunny_ready.set_filter(FilterMode::Nearest);
 
+    //Ajout texture Personnage (32 x 54).
+    let bunny_stand = load_texture("GFX/Players/resized/bunny1_stand.png").await.unwrap();
+    bunny_stand.set_filter(FilterMode::Nearest);
+
+    //Ajout texture Personnage (32 x 37).
+    let bunny_hurt = load_texture("GFX/Players/resized/bunny1_hurt.png").await.unwrap();
+    bunny_hurt.set_filter(FilterMode::Nearest);
+
+    //Ajout texture Personnage (32 x 39).
+    let bunny_jump = load_texture("GFX/Players/resized/bunny1_jump.png").await.unwrap();
+    bunny_jump.set_filter(FilterMode::Nearest);
+
+    //Ajout texture Personnage (32 x 54).
+    let bunny_marche1 = load_texture("GFX/Players/bunny1_walk1.png").await.unwrap();
+    bunny_marche1.set_filter(FilterMode::Nearest);
+
+    //Ajout texture Personnage (32 x 55).
+    let bunny_marche2 = load_texture("GFX/Players/bunny1_walk2.png").await.unwrap();
+    bunny_marche2.set_filter(FilterMode::Nearest);
+     
     let ennemi = load_texture("GFX/Enemies/spikeMan_stand.png").await.unwrap();
     ennemi.set_filter(FilterMode::Nearest);
 
     let all = load_texture("GFX/TileMap/all.png").await.unwrap();
     all.set_filter(FilterMode::Nearest);
 
+    let bg = load_texture("GFX/TileMap/bg.png").await.unwrap();
+    bg.set_filter(FilterMode::Nearest);
+
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
 
     let tiled_map = tiled::load_map(
         &tiled_map_json,
-        &[("Terrain.png", tileset), ("all.png", all)],
+        &[("Terrain.png", tileset), ("all.png", all), ("bg.png", bg)],
         &[],
     )
         .unwrap();
@@ -58,7 +83,7 @@ async fn main() {
 
     //Dans cette boucle nous allons ajouter tout les tuiles, qui sont dans la tilemap déja dans le
     //vecteur collisions_statiques, donc soit c'est solide comme tuile soit il n'y a rien.
-    for (_x, _y, tile) in tiled_map.tiles("main layer", None) {
+    for (_x, _y, tile) in tiled_map.tiles("main-layer", None) {
         collisions_statiques.push(if tile.is_some() {
             Tile::Solid
         } else {
@@ -83,7 +108,7 @@ async fn main() {
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let mut joueur = Joueur {
         //En ce qui concerne les collision, le joueur est un acteur et non pas un objet statique.
-        collider: monde.add_actor(vec2(200.0, 100.0), 36, 36),
+        collider: monde.add_actor(vec2(200.0, 100.0), 32, 51),
         vitesse: vec2(0., 0.),
     };
 
@@ -91,26 +116,27 @@ async fn main() {
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
     loop {
-        //Choisir la caméra actif.
+        //Contient la position de Bunny.
+        let bunny_pos = monde.actor_pos(joueur.collider);
+
         set_camera(&camera);
+        camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
 
         clear_background(WHITE);
 
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
-            "main layer",
+            "main-layer",
             Rect::new(0.0, 0.0, largeur, longeur),
             None,
         );
 
-        //Contient la position de Bunny.
-        let bunny_pos = monde.actor_pos(joueur.collider);
 
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
 
         draw_texture_ex(
-            bunny,
+            bunny_ready,
             bunny_pos.x,
             bunny_pos.y,
             WHITE,
@@ -120,7 +146,7 @@ async fn main() {
             },
         );
 
-        //Si bunny n'est pas sur le sol, alors sa vitesse sera de:
+        //Si bunny n'est pas sur le sol, alors sa vitesse en l'air sera de:
         if sur_le_sol == false{
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
         }
