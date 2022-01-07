@@ -130,10 +130,13 @@ async fn main() {
 
         set_camera(&camera);
 
+        //Contient la position de Bunny.
+        let bunny_pos = monde.actor_pos(joueur.collider);
+
         draw_texture_ex(
             bg,
-            0.,
-            0.,
+            bunny_pos.x / 2.,
+            bunny_pos.y / 2.,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(screen_width(), screen_height())),
@@ -147,8 +150,6 @@ async fn main() {
             None,
         );
 
-        //Contient la position de Bunny.
-        let bunny_pos = monde.actor_pos(joueur.collider);
 
         camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 2., bunny_pos.y / 2., screen_width(),screen_height()));
 
