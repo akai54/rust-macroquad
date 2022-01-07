@@ -17,6 +17,10 @@ struct Joueur {
     vitesse: Vec2,
 }
 
+struct Spring {
+    collider: Solid,
+}
+
 //Les constants du jeu.
 mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
@@ -129,6 +133,10 @@ async fn main() {
         vitesse: vec2(0., 0.),
     };
 
+    let mut spring1 = Spring {
+        collider: monde.add_solid(vec2(275.0,500. ), 32, 17),
+    };
+
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
@@ -145,6 +153,9 @@ async fn main() {
 
         //Contient la position de Bunny.
         let bunny_pos = monde.actor_pos(joueur.collider);
+
+        //Contient la position de spring.
+        let spring_pos = monde.solid_pos(spring1.collider);
 
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
@@ -167,37 +178,22 @@ async fn main() {
             Rect::new(0.0, 0.0, largeur, longeur),
             None,
         );
+        //Afficher spring.
+        draw_texture_ex(spring,
+            275.,
+            500.,
+            WHITE,
+            DrawTextureParams {
+                source: Some(Rect::new(0.0, 0.0, 32., 17.)),
+                ..Default::default()
+            },
+        );
 
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
 
         //Un bool qui indique si Bunny est sur le spring ou pas.
-        let sur_spring = monde.collide_check(joueur.collider, bunny_pos + vec2(275., 500.));
-
-        if sur_spring == false {
-            //Afficher spring.
-            draw_texture_ex(spring,
-                275.,
-                500.,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, 32., 17.)),
-                    ..Default::default()
-                },
-            );
-        }
-
-        else if sur_spring == true {
-            draw_texture_ex(spring_out,
-                275.,
-                492.,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, 32., 24.)),
-                    ..Default::default()
-                },
-            );
-        }
+        //let sur_le_spring = monde.collide_check(spring_pos, bunny_pos + vec2(0., 1.));
 
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
         if sur_le_sol == false{
@@ -217,6 +213,18 @@ async fn main() {
             if bunny_pos.y > consts::LIMITE_MONDE {
                 break;
             }
+        }
+
+        if bunny_pos.x == 275.{
+            draw_texture_ex(spring_out,
+                275.,
+                492.,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, 32., 24.)),
+                    ..Default::default()
+                },
+            );
         }
 
         //Condition de touche pour bouger bunny.
@@ -279,7 +287,7 @@ async fn main() {
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
 
-        println!("{} {}", sur_spring, get_fps());
+        println!("{}",get_fps());
         next_frame().await;
     }
 }
