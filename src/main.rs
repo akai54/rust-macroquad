@@ -119,7 +119,6 @@ async fn main() {
         clear_background(WHITE);
 
         set_camera(&camera);
-        camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
 
         draw_texture_ex(
             bg,
@@ -140,9 +139,11 @@ async fn main() {
 
         //Contient la position de Bunny.
         let bunny_pos = monde.actor_pos(joueur.collider);
+
+        camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 2., bunny_pos.y / 2., screen_width(),screen_height()));
+
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
-
 
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air sera de:
         if sur_le_sol == false{
