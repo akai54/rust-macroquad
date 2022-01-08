@@ -1,7 +1,7 @@
 // Utilisation des bibliotheques necessaires.
 use macroquad::{prelude::*, audio::*};
 use macroquad_tiled as tiled;
-
+use macroquad::ui::{root_ui};
 use macroquad_platformer::*;
 
 //Donc macroquad_platformer est une crate qui nous permet d'avoir un système monde,
@@ -15,6 +15,9 @@ struct Joueur {
     collider: Actor,
     vitesse: Vec2,
 }
+struct Obstacles {
+    collider: Solid,
+}
 
 //Les constants du jeu.
 mod consts {
@@ -25,11 +28,9 @@ mod consts {
     pub const VITESSE_BOOST: f32 = 2.0;
 }
 
-#[macroquad::main("Platformer")]
-async fn main() {
-
+async fn start() {
     //nombre de vies de bunny.
-    let nombre_vies = 3;
+    let mut nombre_vies = 3;
 
     //Choisir la caméra actif.
     let mut camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
@@ -86,6 +87,11 @@ async fn main() {
 
     let son_saut = load_sound("SFX/jump1.ogg").await.unwrap();
 
+    let son_blesse = load_sound("SFX/pain.ogg").await.unwrap();
+
+    let obstacle = load_texture("GFX/Environment/spikes_top_resized.png").await.unwrap();
+    obstacle.set_filter(FilterMode::Nearest);
+
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
 
@@ -129,6 +135,9 @@ async fn main() {
         collider: monde.add_actor(vec2(200.0, 100.0), 32, 51),
         vitesse: vec2(0., 0.),
     };
+    let mut _obs = Obstacles {
+        collider: monde.add_solid(vec2(901., 610.), 32, 18),
+    };
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
@@ -146,9 +155,6 @@ async fn main() {
 
         //Contient la position de Bunny.
         let bunny_pos = monde.actor_pos(joueur.collider);
-
-        //Contient la position de spring.
-        //let spring_pos = monde.solid_pos(spring1.collider);
 
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
@@ -178,6 +184,16 @@ async fn main() {
             WHITE,
             DrawTextureParams {
                 source: Some(Rect::new(0.0, 0.0, 32., 17.)),
+                ..Default::default()
+            },
+        );
+        //Afficher obstacle.
+        draw_texture_ex(obstacle,
+            901.,
+            624.,
+            WHITE,
+            DrawTextureParams {
+                source: Some(Rect::new(0.0, 0.0, 32., 18.)),
                 ..Default::default()
             },
         );
@@ -221,6 +237,25 @@ async fn main() {
             if bunny_pos.y == 461.{
                 joueur.vitesse.y = consts::VITESSE_SAUT * consts::VITESSE_BOOST;
             }
+        }
+        if nombre_vies < 1 {
+            play_sound_once(son_blesse);
+            break;
+        }
+
+        //Si bunny est sur l'obstacle.
+        if bunny_pos.y == 558.0 && bunny_pos.x > 868. && bunny_pos.x < 934.{
+            nombre_vies = nombre_vies - 1;
+            draw_texture_ex(
+                bunny_hurt,
+                bunny_pos.x,
+                bunny_pos.y,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, 32., 37.)),
+                    ..Default::default()
+                },
+            );
         }
 
         //Condition de touche pour bouger bunny.
@@ -281,7 +316,32 @@ async fn main() {
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
-        println!("{}", bunny_pos);
+        next_frame().await;
+    }
+}
+
+#[macroquad::main("Macroquad")]
+async fn main() {
+    loop {
+        let begin = load_texture("GFX/SeasonalTilesets/begin.png").await.unwrap();
+        begin.set_filter(FilterMode::Nearest);
+        draw_texture_ex(begin, 
+            0., 
+            0., 
+            WHITE, 
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), screen_height())),
+                ..Default::default()
+            },
+        );
+        if root_ui().button(Vec2::new(screen_width()/2., screen_height()/2.-30.),"Jouer"){
+            println!("Chargement\nMettez le jeu en plein écran pour une meilleur expérience.");
+            start().await;
+            break;
+        }
+        if root_ui().button(Vec2::new(screen_width()/4., screen_height()/4.),"Quitter"){
+            break;
+        }
         next_frame().await;
     }
 }
