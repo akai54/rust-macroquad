@@ -16,7 +16,7 @@ struct Joueur {
     vitesse: Vec2,
 }
 struct Obstacles {
-    collider: Solid,
+    _collider: Solid,
 }
 
 //Les constants du jeu.
@@ -30,7 +30,7 @@ mod consts {
 
 async fn start() {
     //nombre de vies de bunny.
-    let mut nombre_vies = 3;
+    let mut nombre_vies = 7;
 
     //Choisir la caméra actif.
     let mut camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
@@ -136,7 +136,7 @@ async fn start() {
         vitesse: vec2(0., 0.),
     };
     let mut _obs = Obstacles {
-        collider: monde.add_solid(vec2(901., 610.), 32, 18),
+        _collider: monde.add_solid(vec2(901., 610.), 32, 18),
     };
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
@@ -154,7 +154,7 @@ async fn start() {
         set_camera(&camera);
 
         //Contient la position de Bunny.
-        let bunny_pos = monde.actor_pos(joueur.collider);
+        let mut bunny_pos = monde.actor_pos(joueur.collider);
 
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
@@ -239,13 +239,13 @@ async fn start() {
             }
         }
         if nombre_vies < 1 {
-            play_sound_once(son_blesse);
             break;
         }
 
         //Si bunny est sur l'obstacle.
         if bunny_pos.y == 558.0 && bunny_pos.x > 868. && bunny_pos.x < 934.{
-            nombre_vies = nombre_vies - 1;
+            bunny_pos.y = bunny_pos.y -100.;
+            joueur.vitesse.y = joueur.vitesse.y + consts::VITESSE_SAUT;
             draw_texture_ex(
                 bunny_hurt,
                 bunny_pos.x,
@@ -256,6 +256,8 @@ async fn start() {
                     ..Default::default()
                 },
             );
+            play_sound_once(son_blesse);
+            nombre_vies = nombre_vies - 1;
         }
 
         //Condition de touche pour bouger bunny.
@@ -316,6 +318,7 @@ async fn start() {
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
+        println!("{} {}", bunny_pos, joueur.vitesse.y);
         next_frame().await;
     }
 }
