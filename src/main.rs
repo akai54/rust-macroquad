@@ -24,8 +24,27 @@ mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
     pub const GRAVITE: f32 = 2000.0;
     pub const VITESSE_MOUV: f32 = 300.0;
-    pub const LIMITE_MONDE: f32 = 15000.0;
+    pub const LIMITE_MONDE: f32 = 5000.0;
     pub const VITESSE_BOOST: f32 = 2.0;
+}
+async fn end() {
+    loop {
+        let end = load_texture("GFX/SeasonalTilesets/end.png").await.unwrap();
+        end.set_filter(FilterMode::Nearest);
+        draw_texture_ex(end, 
+            0., 
+            0., 
+            WHITE, 
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), screen_height())),
+                ..Default::default()
+            },
+        );
+        if root_ui().button(Vec2::new(screen_width()/2., screen_height()/2.),"Quitter"){
+            break;
+        }
+        next_frame().await;
+    }
 }
 
 async fn start() {
@@ -219,6 +238,7 @@ async fn start() {
             //Si la position de bunny dépasse la limite du monde,
             //alors le jeu prend fin.
             if bunny_pos.y > consts::LIMITE_MONDE {
+                end().await;
                 break;
             }
         }
@@ -239,6 +259,7 @@ async fn start() {
             }
         }
         if nombre_vies < 1 {
+            end().await;
             break;
         }
 
@@ -322,7 +343,6 @@ async fn start() {
         next_frame().await;
     }
 }
-
 #[macroquad::main("Macroquad")]
 async fn main() {
     loop {
@@ -337,7 +357,7 @@ async fn main() {
                 ..Default::default()
             },
         );
-        if root_ui().button(Vec2::new(screen_width()/2., screen_height()/2.-30.),"Jouer"){
+        if root_ui().button(vec2(screen_width()/2. - 50., screen_height()/2.),"Jouer"){
             println!("Chargement\nMettez le jeu en plein écran pour une meilleur expérience.");
             start().await;
             break;
