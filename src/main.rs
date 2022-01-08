@@ -1,6 +1,5 @@
 // Utilisation des bibliotheques necessaires.
 use macroquad::{prelude::*, audio::*};
-
 use macroquad_tiled as tiled;
 
 use macroquad_platformer::*;
@@ -17,22 +16,20 @@ struct Joueur {
     vitesse: Vec2,
 }
 
-struct Spring {
-    collider: Solid,
-}
-
 //Les constants du jeu.
 mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
     pub const GRAVITE: f32 = 2000.0;
     pub const VITESSE_MOUV: f32 = 300.0;
     pub const LIMITE_MONDE: f32 = 15000.0;
+    pub const VITESSE_BOOST: f32 = 2.0;
 }
+
 #[macroquad::main("Platformer")]
 async fn main() {
 
     //nombre de vies de bunny.
-    let mut nombre_vies = 3;
+    let nombre_vies = 3;
 
     //Choisir la caméra actif.
     let mut camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
@@ -89,6 +86,8 @@ async fn main() {
 
     let son_saut = load_sound("SFX/jump1.ogg").await.unwrap();
 
+    let font = load_ttf_font("Polices/candles_.ttf").await.unwrap();
+
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
 
@@ -133,10 +132,6 @@ async fn main() {
         vitesse: vec2(0., 0.),
     };
 
-    let mut spring1 = Spring {
-        collider: monde.add_solid(vec2(275.0,500. ), 32, 17),
-    };
-
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
@@ -155,10 +150,21 @@ async fn main() {
         let bunny_pos = monde.actor_pos(joueur.collider);
 
         //Contient la position de spring.
-        let spring_pos = monde.solid_pos(spring1.collider);
+        //let spring_pos = monde.solid_pos(spring1.collider);
 
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
+
+        draw_text_ex(
+            "abcd",
+            300.0,
+            260.0,
+            TextParams {
+                font_size: 100,
+                font,
+                ..Default::default()
+            },
+        );
 
         //Afficher fond d'écran.
         draw_texture_ex(
@@ -215,7 +221,8 @@ async fn main() {
             }
         }
 
-        if bunny_pos.x == 275.{
+        // Si bunny est sur le spring, alors il va sauter en l'air.
+        if bunny_pos.x > 242. && bunny_pos.x < 308.{
             draw_texture_ex(spring_out,
                 275.,
                 492.,
@@ -225,6 +232,9 @@ async fn main() {
                     ..Default::default()
                 },
             );
+            if bunny_pos.y == 461.{
+                joueur.vitesse.y = consts::VITESSE_SAUT * consts::VITESSE_BOOST;
+            }
         }
 
         //Condition de touche pour bouger bunny.
@@ -256,7 +266,6 @@ async fn main() {
                 },
             );
         }
-
         else if is_key_pressed(KeyCode::Space) {
             if sur_le_sol{
                 joueur.vitesse.y = consts::VITESSE_SAUT;
@@ -286,8 +295,7 @@ async fn main() {
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
-
-        println!("{}",get_fps());
+        println!("{}", bunny_pos);
         next_frame().await;
     }
 }
