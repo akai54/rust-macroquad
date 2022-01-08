@@ -86,8 +86,6 @@ async fn main() {
 
     let son_saut = load_sound("SFX/jump1.ogg").await.unwrap();
 
-    let font = load_ttf_font("Polices/candles_.ttf").await.unwrap();
-
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
 
@@ -155,17 +153,6 @@ async fn main() {
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
 
-        draw_text_ex(
-            "abcd",
-            300.0,
-            260.0,
-            TextParams {
-                font_size: 100,
-                font,
-                ..Default::default()
-            },
-        );
-
         //Afficher fond d'écran.
         draw_texture_ex(
             bg,
@@ -194,12 +181,11 @@ async fn main() {
                 ..Default::default()
             },
         );
+        //Affichage nombre de vies restants.
+        draw_text(&nombre_vies.to_string(), bunny_pos.x + 10., bunny_pos.y - 6., 15., GREEN);
 
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
-
-        //Un bool qui indique si Bunny est sur le spring ou pas.
-        //let sur_le_spring = monde.collide_check(spring_pos, bunny_pos + vec2(0., 1.));
 
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
         if sur_le_sol == false{
