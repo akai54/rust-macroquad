@@ -20,6 +20,13 @@ struct Ennemi {
     collider: Actor,
     vitesse: Vec2,
 }
+
+struct Tirer {
+    collider: Actor,
+    pos: Vec2,
+    combat: Vec2,
+    rond: i32,
+}
 struct Obstacles {
     _collider: Solid,
 }
@@ -32,6 +39,9 @@ mod consts {
     pub const LIMITE_MONDE: f32 = 5000.0;
     pub const VITESSE_BOOST: f32 = 2.0;
 }
+
+static mut SHOOT:bool = false;
+static mut X: f32 = 4.0;
 
 async fn end() {
     loop {
@@ -54,6 +64,7 @@ async fn end() {
 }
 
 async fn start() {
+    let mut face_right = true;
     //nombre de vies de bunny.
     let mut nombre_vies = 7;
 
@@ -168,6 +179,13 @@ async fn start() {
     let ennemi = Ennemi {
         collider: monde.add_actor(vec2(746., 610.), 25, 32),
         vitesse: vec2(0., 0.),
+    };
+
+    let tirer:Tirer = Tirer {
+        collider: monde.add_actor(vec2(743., 608.), 1,1),
+        pos: vec2(739.,599.),
+        combat: vec2(0.0,0.0),
+        rond : 0,
     };
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
@@ -322,6 +340,7 @@ async fn start() {
                     ..Default::default()
                 },
             );
+            face_right = true;
         }
 
         else if is_key_down(KeyCode::Left) {
@@ -337,6 +356,7 @@ async fn start() {
                     ..Default::default()
                 },
             );
+            face_right = false;
         }
         else if is_key_pressed(KeyCode::Space) {
             if sur_le_sol{
@@ -363,6 +383,56 @@ async fn start() {
                 },
             );
         }
+
+        let tirer_pos= monde.actor_pos(tirer.collider);
+
+       /* let mut combats = Vec2::new();*/
+/*
+        if bunny_pos.x >= 589. {
+        draw_circle(
+            tirer_pos.x,
+             tirer_pos.y, 
+             2.5, 
+             BLACK,
+        );
+        }
+        */
+    
+        unsafe {
+
+        
+        while is_key_released(KeyCode::A ) {
+            
+        if face_right {
+             X = bunny_pos.x;
+            SHOOT = true;
+           
+        }
+        break;
+    }
+
+    /*
+    
+    maatch bunny_pos {
+
+    }
+    
+    
+    
+    
+    */
+    
+    if SHOOT {
+        let y = bunny_pos.y;
+            X += 4.0; 
+            draw_circle(
+                X,
+                y, 
+                 100.5, 
+                 BLUE,
+            );
+    }
+        }
         draw_texture_ex(
             ennemi_draw,
             ennemi_pos.x,
@@ -373,13 +443,40 @@ async fn start() {
                 ..Default::default()
             },
         );
+
+        
+
+        /*
+        let mut rotation = Tirer {
+            pos: Vec2::new(screen_width() / 2., screen_height() / 2.),
+            rotation: 0.,
+            vel: Vec2::new(0., 0.),
+        };
+        let v1= Vec2::new(
+            ennemi_pos.x + rotation.sin() * bunny_stand / 2.,
+            ennemi_pos.y - rotation.cos() * bunny_stand / 2.,);
+
+        let v2 = Vec2::new(
+                ennemi_pos.x - rotation.cos() * TIRER_BASE/ 2. - rotation.sin() * TIRER_HEIGHT / 2.,
+                ennemi_pos.y - rotation.sin() * TIRER_BASE/ 2. + rotation.cos() * TIRER_HEIGHT / 2.,
+            );
+         let v3 = Vec2::new(
+                ennemi_pos.x + rotation.cos() * TIRER_BASE/ 2. - rotation.sin() * TIRER_HEIGHT / 2.,
+                ennemi_pos.y + rotation.sin() * TIRER_BASE/ 2. + rotation.cos() * TIRER_HEIGHT / 2.,
+            );*/
+
+        
+              
+            
+        
+    
         /* if bunny_pos == a tel position && ennemi_pos == tel position{
            On draw des tirets qui donne l'illusion que c'est l'ennemi qui tire 
            Comme ça le bunny saute pour eviter et fini par lui sauter sur la tête pour le "tuer"
            Comme ça c'est pas mignon c'est tout kawaii 
         } */ 
 
-
+        
 
 
 
@@ -393,9 +490,11 @@ async fn start() {
 
         next_frame().await;
     }
+    
 }
 #[macroquad::main("Macroquad")]
 async fn main() {
+    
     loop {
         let begin = load_texture("GFX/SeasonalTilesets/begin.png").await.unwrap();
         begin.set_filter(FilterMode::Nearest);
