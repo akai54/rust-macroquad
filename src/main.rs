@@ -55,7 +55,7 @@ async fn end() {
 
 async fn start() {
     //nombre de vies de bunny.
-    let mut nombre_vies = 3;
+    let mut nombre_vies = 6;
 
     //Choisir la caméra actif.
     let mut camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
