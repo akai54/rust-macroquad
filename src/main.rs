@@ -1,8 +1,8 @@
 // Utilisation des bibliotheques necessaires.
-use macroquad::{prelude::*, audio::*};
-use macroquad_tiled as tiled;
-use macroquad::ui::{root_ui};
+use macroquad::ui::root_ui;
+use macroquad::{audio::*, prelude::*};
 use macroquad_platformer::*;
+use macroquad_tiled as tiled;
 
 //Donc macroquad_platformer est une crate qui nous permet d'avoir un système monde,
 //dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
@@ -47,16 +47,20 @@ async fn end() {
     loop {
         let end = load_texture("GFX/SeasonalTilesets/end.png").await.unwrap();
         end.set_filter(FilterMode::Nearest);
-        draw_texture_ex(end, 
-            0., 
-            0., 
-            WHITE, 
+        draw_texture_ex(
+            end,
+            0.,
+            0.,
+            WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(screen_width(), screen_height())),
                 ..Default::default()
             },
         );
-        if root_ui().button(Vec2::new(screen_width()/2., screen_height()/2.),"Quitter"){
+        if root_ui().button(
+            Vec2::new(screen_width() / 2., screen_height() / 2.),
+            "Quitter",
+        ) {
             break;
         }
         next_frame().await;
@@ -66,10 +70,11 @@ async fn end() {
 async fn start() {
     let mut face_right = true;
     //nombre de vies de bunny.
-    let mut nombre_vies = 7;
+    let mut nombre_vies = 6;
 
     //Choisir la caméra actif.
-    let mut camera = Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(),screen_height()));
+    let mut camera =
+        Camera2D::from_display_rect(Rect::new(0.0, 0.0, screen_width(), screen_height()));
 
     //Ajout tileset
     let tileset = load_texture("GFX/TileMap/Terrain.png").await.unwrap();
@@ -77,32 +82,51 @@ async fn start() {
     //Sets the FilterMode of this texture.
     tileset.set_filter(FilterMode::Nearest);
 
+    let autumn = load_texture("GFX/TileMap/Autumn_entities(16x16).png")
+        .await
+        .unwrap();
+    autumn.set_filter(FilterMode::Nearest);
+
     //Ajout texture Personnage (32 x 51).
-    let bunny_ready = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
+    let bunny_ready = load_texture("GFX/Players/resized/bunny1_ready.png")
+        .await
+        .unwrap();
     bunny_ready.set_filter(FilterMode::Nearest);
 
     //Ajout texture Personnage (32 x 54).
-    let bunny_stand = load_texture("GFX/Players/resized/bunny1_stand.png").await.unwrap();
+    let bunny_stand = load_texture("GFX/Players/resized/bunny1_stand.png")
+        .await
+        .unwrap();
     bunny_stand.set_filter(FilterMode::Nearest);
 
     //Ajout texture Personnage (32 x 37).
-    let bunny_hurt = load_texture("GFX/Players/resized/bunny1_hurt.png").await.unwrap();
+    let bunny_hurt = load_texture("GFX/Players/resized/bunny1_hurt.png")
+        .await
+        .unwrap();
     bunny_hurt.set_filter(FilterMode::Nearest);
 
     //Ajout texture Personnage (32 x 39).
-    let bunny_jump = load_texture("GFX/Players/resized/bunny1_jump.png").await.unwrap();
+    let bunny_jump = load_texture("GFX/Players/resized/bunny1_jump.png")
+        .await
+        .unwrap();
     bunny_jump.set_filter(FilterMode::Nearest);
 
     //Ajout texture Personnage (32 x 54).
-    let bunny_marche1 = load_texture("GFX/Players/resized/bunny1_walk1.png").await.unwrap();
+    let bunny_marche1 = load_texture("GFX/Players/resized/bunny1_walk1.png")
+        .await
+        .unwrap();
     bunny_marche1.set_filter(FilterMode::Nearest);
 
     //Ajout texture Personnage (32 x 55).
-    let bunny_marche2 = load_texture("GFX/Players/resized/bunny1_walk2.png").await.unwrap();
+    let bunny_marche2 = load_texture("GFX/Players/resized/bunny1_walk2.png")
+        .await
+        .unwrap();
     bunny_marche2.set_filter(FilterMode::Nearest);
 
-    // 
-    let ennemi_draw = load_texture("GFX/Enemies/resized/spikeMan_stand.png").await.unwrap();
+    //
+    let ennemi_draw = load_texture("GFX/Enemies/resized/spikeMan_stand.png")
+        .await
+        .unwrap();
     ennemi_draw.set_filter(FilterMode::Nearest);
 
     let all = load_texture("GFX/TileMap/all.png").await.unwrap();
@@ -114,10 +138,14 @@ async fn start() {
     let spring = load_texture("GFX/Items/resized/spring.png").await.unwrap();
     spring.set_filter(FilterMode::Nearest);
 
-    let spring_in = load_texture("GFX/Items/resized/spring_in.png").await.unwrap();
+    let spring_in = load_texture("GFX/Items/resized/spring_in.png")
+        .await
+        .unwrap();
     spring_in.set_filter(FilterMode::Nearest);
 
-    let spring_out = load_texture("GFX/Items/resized/spring_out.png").await.unwrap();
+    let spring_out = load_texture("GFX/Items/resized/spring_out.png")
+        .await
+        .unwrap();
     spring_out.set_filter(FilterMode::Nearest);
 
     let son_bg = load_sound("SFX/Chiptune_Adventures_1.ogg").await.unwrap();
@@ -126,7 +154,9 @@ async fn start() {
 
     let son_blesse = load_sound("SFX/pain.ogg").await.unwrap();
 
-    let obstacle = load_texture("GFX/Environment/spikes_top_resized.png").await.unwrap();
+    let obstacle = load_texture("GFX/Environment/spikes_top_resized.png")
+        .await
+        .unwrap();
     obstacle.set_filter(FilterMode::Nearest);
 
     //Charger le fichier json de la map.
@@ -134,10 +164,15 @@ async fn start() {
 
     let tiled_map = tiled::load_map(
         &tiled_map_json,
-        &[("Terrain.png", tileset), ("all.png", all), ("bg.png", bg)],
+        &[
+            ("Terrain.png", tileset),
+            ("all.png", all),
+            ("bg.png", bg),
+            ("Autumn_entities(16x16).png", autumn),
+        ],
         &[],
     )
-        .unwrap();
+    .unwrap();
 
     //Les tuiles statiques, sont sauvegardé dans un vecteur.
     let mut collisions_statiques = vec![];
@@ -145,11 +180,28 @@ async fn start() {
     //Dans cette boucle nous allons ajouter tout les tuiles, qui sont dans la tilemap déja dans le
     //vecteur collisions_statiques, donc soit c'est solide comme tuile soit il n'y a rien.
     for (_x, _y, tile) in tiled_map.tiles("main-layer", None) {
-        collisions_statiques.push(if tile.is_some() {
-            Tile::Solid
-        } else {
-            Tile::Empty
-        });
+        collisions_statiques.push(
+            //OK donc, ici cette boucle est censé donner des collisions aux tiles suivant la tilemap
+            //crée, sauf qu'avec cette condition, les tiles venant de la tileset "all" n'auront pas
+            //de collisions !! C'est donc merveillieux pour les décorations.
+            //Update: filter plus simple que map.
+            //Encore plus simple.
+            if tile.is_some() {
+                if tile.as_ref().filter(|tile| tile.tileset == "all").is_some() {
+                    Tile::Empty
+                } else if tile
+                    .as_ref()
+                    .filter(|tile| tile.tileset == "Autumn_entities(16x16)")
+                    .is_some()
+                {
+                    Tile::Empty
+                } else {
+                    Tile::Solid
+                }
+            } else {
+                Tile::Empty
+            },
+        );
     }
 
     let mut monde = World::new();
@@ -158,11 +210,11 @@ async fn start() {
     //on leur connait grace à la taille des tuiles en pixel de la tilemap.
     //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
     //l'étiquette.
-    monde.add_static_tiled_layer( 
-        collisions_statiques, 
-        tiled_map.raw_tiled_map.tilewidth as f32, 
-        tiled_map.raw_tiled_map.tileheight as f32, 
-        tiled_map.raw_tiled_map.width as _, 
+    monde.add_static_tiled_layer(
+        collisions_statiques,
+        tiled_map.raw_tiled_map.tilewidth as f32,
+        tiled_map.raw_tiled_map.tileheight as f32,
+        tiled_map.raw_tiled_map.width as _,
         1,
     );
 
@@ -176,7 +228,7 @@ async fn start() {
         _collider: monde.add_solid(vec2(901., 610.), 32, 18),
     };
 
-    let ennemi = Ennemi {
+    let mut ennemi = Ennemi {
         collider: monde.add_actor(vec2(746., 610.), 25, 32),
         vitesse: vec2(0., 0.),
     };
@@ -189,13 +241,14 @@ async fn start() {
     };
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
-    let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
+    let longeur = tiled_map.raw_tiled_map.tileheight as f32 * tiled_map.raw_tiled_map.height as f32;
 
-    play_sound(son_bg,  
-        PlaySoundParams { 
-            looped:true, 
-            volume:0.6,
-        }, 
+    play_sound(
+        son_bg,
+        PlaySoundParams {
+            looped: true,
+            volume: 0.6,
+        },
     );
     loop {
         clear_background(WHITE);
@@ -205,10 +258,15 @@ async fn start() {
         //Contient la position de Bunny.
         let mut bunny_pos = monde.actor_pos(joueur.collider);
         // Position ennemi
-        let ennemi_pos= monde.actor_pos(ennemi.collider);
+        let ennemi_pos = monde.actor_pos(ennemi.collider);
 
         //La caméra suit le joueur.
-        camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
+        camera = Camera2D::from_display_rect(Rect::new(
+            bunny_pos.x / 3.5,
+            bunny_pos.y / 3.5,
+            screen_width(),
+            screen_height(),
+        ));
 
         //Afficher fond d'écran.
         draw_texture_ex(
@@ -221,7 +279,6 @@ async fn start() {
                 ..Default::default()
             },
         );
-
 
         draw_texture_ex(
             bg,
@@ -242,7 +299,8 @@ async fn start() {
             None,
         );
         //Afficher spring.
-        draw_texture_ex(spring,
+        draw_texture_ex(
+            spring,
             275.,
             500.,
             WHITE,
@@ -252,7 +310,8 @@ async fn start() {
             },
         );
         //Afficher obstacle.
-        draw_texture_ex(obstacle,
+        draw_texture_ex(
+            obstacle,
             901.,
             624.,
             WHITE,
@@ -262,13 +321,22 @@ async fn start() {
             },
         );
         //Affichage nombre de vies restants.
-        draw_text(&nombre_vies.to_string(), bunny_pos.x + 10., bunny_pos.y - 6., 15., GREEN);
+        draw_text(
+            &nombre_vies.to_string(),
+            bunny_pos.x + 10.,
+            bunny_pos.y - 6.,
+            15.,
+            GREEN,
+        );
 
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
 
+        //Un bool qui indique si Bunny est sur le sol ou pas.
+        let sur_le_sol_ennemi = monde.collide_check(ennemi.collider, ennemi_pos + vec2(0., 1.));
+
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
-        if sur_le_sol == false{
+        if sur_le_sol == false {
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
             draw_texture_ex(
                 bunny_jump,
@@ -281,6 +349,10 @@ async fn start() {
                 },
             );
 
+            if sur_le_sol_ennemi == false {
+                ennemi.vitesse.y += consts::GRAVITE * get_frame_time();
+            }
+
             //Si la position de bunny dépasse la limite du monde,
             //alors le jeu prend fin.
             if bunny_pos.y > consts::LIMITE_MONDE {
@@ -290,8 +362,9 @@ async fn start() {
         }
 
         // Si bunny est sur le spring, alors il va sauter en l'air.
-        if bunny_pos.x > 242. && bunny_pos.x < 308.{
-            draw_texture_ex(spring_out,
+        if bunny_pos.x > 242. && bunny_pos.x < 308. {
+            draw_texture_ex(
+                spring_out,
                 275.,
                 492.,
                 WHITE,
@@ -300,7 +373,7 @@ async fn start() {
                     ..Default::default()
                 },
             );
-            if bunny_pos.y == 461.{
+            if bunny_pos.y == 461. {
                 joueur.vitesse.y = consts::VITESSE_SAUT * consts::VITESSE_BOOST;
             }
         }
@@ -310,8 +383,8 @@ async fn start() {
         }
 
         //Si bunny est sur l'obstacle.
-        if bunny_pos.y == 558.0 && bunny_pos.x > 868. && bunny_pos.x < 934.{
-            bunny_pos.y = bunny_pos.y -100.;
+        if bunny_pos.y == 558.0 && bunny_pos.x > 868. && bunny_pos.x < 934. {
+            bunny_pos.y = bunny_pos.y - 100.;
             joueur.vitesse.y = joueur.vitesse.y + consts::VITESSE_SAUT;
             draw_texture_ex(
                 bunny_hurt,
@@ -361,16 +434,15 @@ async fn start() {
         else if is_key_pressed(KeyCode::Space) {
             if sur_le_sol{
                 joueur.vitesse.y = consts::VITESSE_SAUT;
-                play_sound(son_saut, 
-                    PlaySoundParams { 
-                        looped:false, 
-                        volume:0.6,
-                    }, 
+                play_sound(
+                    son_saut,
+                    PlaySoundParams {
+                        looped: false,
+                        volume: 0.6,
+                    },
                 );
-            } 
-        }
-
-        else{
+            }
+        } else {
             joueur.vitesse.x = 0.;
             draw_texture_ex(
                 bunny_stand,
@@ -471,20 +543,25 @@ async fn start() {
         
     
         /* if bunny_pos == a tel position && ennemi_pos == tel position{
+<<<<<<< HEAD
            On draw des tirets qui donne l'illusion que c'est l'ennemi qui tire 
            Comme ça le bunny saute pour eviter et fini par lui sauter sur la tête pour le "tuer"
            Comme ça c'est pas mignon c'est tout kawaii 
         } */ 
 
         
+/*
 
-
+=======/*
+        On draw des tirets qui donne l'illusion que c'est l'ennemi qui tire
+        Comme ça le bunny saute pour eviter et fini par lui sauter sur la tête pour le "tuer"
+        Comme ça c'est pas mignon c'est tout kawaii
+        } */
+>>>>>>> refs/remotes/origin/main */
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
-        println!("{} {}", bunny_pos, joueur.vitesse.y);
-
         monde.move_h(ennemi.collider, ennemi.vitesse.x * get_frame_time());
         monde.move_v(ennemi.collider, ennemi.vitesse.y * get_frame_time());
 
@@ -496,23 +573,35 @@ async fn start() {
 async fn main() {
     
     loop {
-        let begin = load_texture("GFX/SeasonalTilesets/begin.png").await.unwrap();
+        //Image du menu avant le démarrage du jeu.
+        let begin = load_texture("GFX/SeasonalTilesets/begin.png")
+            .await
+            .unwrap();
         begin.set_filter(FilterMode::Nearest);
-        draw_texture_ex(begin, 
-            0., 
-            0., 
-            WHITE, 
+        draw_texture_ex(
+            begin,
+            0.,
+            0.,
+            WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(screen_width(), screen_height())),
                 ..Default::default()
             },
         );
-        if root_ui().button(vec2(screen_width()/2. - 50., screen_height()/2.),"Jouer"){
+        //Le bouton Jouer
+        if root_ui().button(
+            vec2(screen_width() / 2. - 50., screen_height() / 2.),
+            "Jouer",
+        ) {
             println!("Chargement\nMettez le jeu en plein écran pour une meilleur expérience.");
             start().await;
             break;
         }
-        if root_ui().button(Vec2::new(screen_width()/4., screen_height()/4.),"Quitter"){
+        //Le bouton quitter
+        if root_ui().button(
+            Vec2::new(screen_width() / 4., screen_height() / 4.),
+            "Quitter",
+        ) {
             break;
         }
         next_frame().await;
