@@ -373,6 +373,15 @@ async fn start() {
                 ..Default::default()
             },
         );
+        /* if bunny_pos == a tel position && ennemi_pos == tel position{
+           On draw des tirets qui donne l'illusion que c'est l'ennemi qui tire 
+           Comme ça le bunny saute pour eviter et fini par lui sauter sur la tête pour le "tuer"
+           Comme ça c'est pas mignon c'est tout kawaii 
+        } */ 
+
+
+
+
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
