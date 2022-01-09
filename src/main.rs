@@ -66,6 +66,9 @@ async fn start() {
     //Sets the FilterMode of this texture.
     tileset.set_filter(FilterMode::Nearest);
 
+    let autumn = load_texture("GFX/TileMap/Autumn_entities(16x16).png").await.unwrap();
+    autumn.set_filter(FilterMode::Nearest);
+
     //Ajout texture Personnage (32 x 51).
     let bunny_ready = load_texture("GFX/Players/resized/bunny1_ready.png").await.unwrap();
     bunny_ready.set_filter(FilterMode::Nearest);
@@ -123,7 +126,7 @@ async fn start() {
 
     let tiled_map = tiled::load_map(
         &tiled_map_json,
-        &[("Terrain.png", tileset), ("all.png", all), ("bg.png", bg)],
+        &[("Terrain.png", tileset), ("all.png", all), ("bg.png", bg), ("Autumn_entities(16x16).png", autumn)],
         &[],
     )
         .unwrap();
@@ -135,14 +138,25 @@ async fn start() {
     //vecteur collisions_statiques, donc soit c'est solide comme tuile soit il n'y a rien.
     for (_x, _y, tile) in tiled_map.tiles("main-layer", None) {
         collisions_statiques.push( 
-        //OK donc, ici cette boucle est censé donner des collisions aux tiles suivant la tilemap
-        //crée, sauf qu'avec cette condition, les tiles venant de la tileset "all" n'auront pas
-        //de collisions !! C'est donc merveillieux pour les décorations.
-    if tile.as_ref().map(|tile| tile.tileset != "all").unwrap_or(false) {
-            Tile::Solid
-        } else {
-            Tile::Empty
-        });
+            //OK donc, ici cette boucle est censé donner des collisions aux tiles suivant la tilemap
+            //crée, sauf qu'avec cette condition, les tiles venant de la tileset "all" n'auront pas
+            //de collisions !! C'est donc merveillieux pour les décorations.
+            //Update: filter plus simple que map.
+            //Encore plus simple.
+            if tile.is_some(){
+                if tile.as_ref().filter(|tile| tile.tileset == "all").is_some() {
+                    Tile::Empty
+                } 
+                else if tile.as_ref().filter(|tile| tile.tileset == "Autumn_entities(16x16)").is_some() {
+                    Tile::Empty
+                }
+                else {
+                    Tile::Solid
+                }
+            }
+            else {
+                Tile::Empty
+            });
     }
 
     let mut monde = World::new();
@@ -388,7 +402,7 @@ async fn start() {
            On draw des tirets qui donne l'illusion que c'est l'ennemi qui tire 
            Comme ça le bunny saute pour eviter et fini par lui sauter sur la tête pour le "tuer"
            Comme ça c'est pas mignon c'est tout kawaii 
-        } */ 
+           } */ 
 
 
 
