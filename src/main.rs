@@ -21,12 +21,6 @@ struct Ennemi {
     vitesse: Vec2,
 }
 
-struct Tirer {
-    collider: Actor,
-    pos: Vec2,
-    combat: Vec2,
-    rond: i32,
-}
 struct Obstacles {
     _collider: Solid,
 }
@@ -231,13 +225,6 @@ async fn start() {
     let mut ennemi = Ennemi {
         collider: monde.add_actor(vec2(746., 610.), 25, 32),
         vitesse: vec2(0., 0.),
-    };
-
-    let tirer:Tirer = Tirer {
-        collider: monde.add_actor(vec2(743., 608.), 1,1),
-        pos: vec2(739.,599.),
-        combat: vec2(0.0,0.0),
-        rond : 0,
     };
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
@@ -455,21 +442,7 @@ async fn start() {
                 },
             );
         }
-
-        let tirer_pos= monde.actor_pos(tirer.collider);
-
-       /* let mut combats = Vec2::new();*/
-/*
-        if bunny_pos.x >= 589. {
-        draw_circle(
-            tirer_pos.x,
-             tirer_pos.y, 
-             2.5, 
-             BLACK,
-        );
-        }
-        */
-    
+    /* Système de combat : Le bunny lance une boule sur l'ennemi */
         unsafe {
 
         
@@ -482,25 +455,14 @@ async fn start() {
         }
         break;
     }
-
-    /*
-    
-    maatch bunny_pos {
-
-    }
-    
-    
-    
-    
-    */
     
     if SHOOT {
         let y = bunny_pos.y;
-            X += 4.0; 
+            X += 2.0; 
             draw_circle(
                 X,
                 y, 
-                 100.5, 
+                 10.5, 
                  BLUE,
             );
     }
@@ -516,48 +478,6 @@ async fn start() {
             },
         );
 
-        
-
-        /*
-        let mut rotation = Tirer {
-            pos: Vec2::new(screen_width() / 2., screen_height() / 2.),
-            rotation: 0.,
-            vel: Vec2::new(0., 0.),
-        };
-        let v1= Vec2::new(
-            ennemi_pos.x + rotation.sin() * bunny_stand / 2.,
-            ennemi_pos.y - rotation.cos() * bunny_stand / 2.,);
-
-        let v2 = Vec2::new(
-                ennemi_pos.x - rotation.cos() * TIRER_BASE/ 2. - rotation.sin() * TIRER_HEIGHT / 2.,
-                ennemi_pos.y - rotation.sin() * TIRER_BASE/ 2. + rotation.cos() * TIRER_HEIGHT / 2.,
-            );
-         let v3 = Vec2::new(
-                ennemi_pos.x + rotation.cos() * TIRER_BASE/ 2. - rotation.sin() * TIRER_HEIGHT / 2.,
-                ennemi_pos.y + rotation.sin() * TIRER_BASE/ 2. + rotation.cos() * TIRER_HEIGHT / 2.,
-            );*/
-
-        
-              
-            
-        
-    
-        /* if bunny_pos == a tel position && ennemi_pos == tel position{
-<<<<<<< HEAD
-           On draw des tirets qui donne l'illusion que c'est l'ennemi qui tire 
-           Comme ça le bunny saute pour eviter et fini par lui sauter sur la tête pour le "tuer"
-           Comme ça c'est pas mignon c'est tout kawaii 
-        } */ 
-
-        
-/*
-
-=======/*
-        On draw des tirets qui donne l'illusion que c'est l'ennemi qui tire
-        Comme ça le bunny saute pour eviter et fini par lui sauter sur la tête pour le "tuer"
-        Comme ça c'est pas mignon c'est tout kawaii
-        } */
->>>>>>> refs/remotes/origin/main */
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
