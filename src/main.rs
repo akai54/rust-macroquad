@@ -15,6 +15,11 @@ struct Joueur {
     collider: Actor,
     vitesse: Vec2,
 }
+
+struct Ennemi {
+    collider_ennemi : Actor,
+    vitesse_ennemi: Vec2,
+}
 struct Obstacles {
     _collider: Solid,
 }
@@ -27,6 +32,16 @@ mod consts {
     pub const LIMITE_MONDE: f32 = 5000.0;
     pub const VITESSE_BOOST: f32 = 2.0;
 }
+// Constante de l'ennemi
+mod consts_ennemi {
+    pub const VITESSE_SAUT_ENNEMI: f32 = -700.0;
+    pub const GRAVITE_ENNEMI: f32 = 2000.0;
+    pub const VITESSE_ENNMI:f32 = 300.0;
+    pub const LIMITE_MONDE_ENNEMI: f32 = 5000.0;
+    pub const VITESSE_BOOST_ENNEMI: f32 = 2.0;
+}
+
+
 async fn end() {
     loop {
         let end = load_texture("GFX/SeasonalTilesets/end.png").await.unwrap();
@@ -84,8 +99,8 @@ async fn start() {
     let bunny_marche2 = load_texture("GFX/Players/resized/bunny1_walk2.png").await.unwrap();
     bunny_marche2.set_filter(FilterMode::Nearest);
 
-    let ennemi = load_texture("GFX/Enemies/spikeMan_stand.png").await.unwrap();
-    ennemi.set_filter(FilterMode::Nearest);
+    let ennemi_draw = load_texture("GFX/Enemies/spikeMan_stand.png").await.unwrap();
+    ennemi_draw.set_filter(FilterMode::Nearest);
 
     let all = load_texture("GFX/TileMap/all.png").await.unwrap();
     all.set_filter(FilterMode::Nearest);
@@ -158,6 +173,13 @@ async fn start() {
         _collider: monde.add_solid(vec2(901., 610.), 32, 18),
     };
 
+    let mut ennemi:Ennemi = Ennemi {
+        collider_ennemi: monde.add_actor(vec2(100.0, 50.0), 32, 51),
+        vitesse_ennemi: vec2(0., 0.),
+    };
+
+    
+
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32* tiled_map.raw_tiled_map.height as f32;
 
@@ -174,6 +196,8 @@ async fn start() {
 
         //Contient la position de Bunny.
         let mut bunny_pos = monde.actor_pos(joueur.collider);
+        // Position ennemi
+        let mut ennemi_pos: Vec2 = monde.actor_pos(actor: Ennemi.collider_ennemi);
 
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(bunny_pos.x / 3.5, bunny_pos.y / 3.5, screen_width(),screen_height()));
@@ -189,6 +213,30 @@ async fn start() {
                 ..Default::default()
             },
         );
+
+        draw_texture_ex(
+            ennemi_draw,
+            ennemi_pos.x / 3.5,
+            ennemi_pos.y / 3.5,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), screen_height())),
+                ..Default::default()
+            },
+        );
+
+
+        draw_texture_ex(
+            bg,
+            bunny_pos.x / 3.5,
+            bunny_pos.y / 3.5,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), screen_height())),
+                ..Default::default()
+            },
+        );
+
         //Afficher les tuiles.
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
@@ -340,6 +388,11 @@ async fn start() {
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
         println!("{} {}", bunny_pos, joueur.vitesse.y);
+
+        monde.move_h(ennemi.collider_ennemi, ennemi.vitesse_ennemi.x * get_frame_time());
+        monde.move_v(ennemi.collider_ennemi, ennemi.vitesse_ennemi.y * get_frame_time());
+        println!("{} {}", ennemi_pos, ennemi.vitesse_ennemi.y);
+
         next_frame().await;
     }
 }
