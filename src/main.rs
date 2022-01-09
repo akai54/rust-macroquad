@@ -134,7 +134,11 @@ async fn start() {
     //Dans cette boucle nous allons ajouter tout les tuiles, qui sont dans la tilemap déja dans le
     //vecteur collisions_statiques, donc soit c'est solide comme tuile soit il n'y a rien.
     for (_x, _y, tile) in tiled_map.tiles("main-layer", None) {
-        collisions_statiques.push(if tile.is_some() {
+        collisions_statiques.push( 
+        //OK donc, ici cette boucle est censé donner des collisions aux tiles suivant la tilemap
+        //crée, sauf qu'avec cette condition, les tiles venant de la tileset "all" n'auront pas
+        //de collisions !! C'est donc merveillieux pour les décorations.
+    if tile.as_ref().map(|tile| tile.tileset != "all").unwrap_or(false) {
             Tile::Solid
         } else {
             Tile::Empty
@@ -165,7 +169,7 @@ async fn start() {
         _collider: monde.add_solid(vec2(901., 610.), 32, 18),
     };
 
-    let ennemi = Ennemi {
+    let mut ennemi = Ennemi {
         collider: monde.add_actor(vec2(746., 610.), 25, 32),
         vitesse: vec2(0., 0.),
     };
@@ -249,6 +253,9 @@ async fn start() {
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
 
+        //Un bool qui indique si Bunny est sur le sol ou pas.
+        let sur_le_sol_ennemi = monde.collide_check(ennemi.collider, ennemi_pos + vec2(0., 1.));
+
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
         if sur_le_sol == false{
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
@@ -262,6 +269,10 @@ async fn start() {
                     ..Default::default()
                 },
             );
+
+            if sur_le_sol_ennemi == false {
+                ennemi.vitesse.y += consts::GRAVITE * get_frame_time();
+            }
 
             //Si la position de bunny dépasse la limite du monde,
             //alors le jeu prend fin.
