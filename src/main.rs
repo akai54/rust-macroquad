@@ -127,6 +127,9 @@ async fn start() {
     let spring = load_texture("GFX/Items/resized/spring.png").await.unwrap();
     spring.set_filter(FilterMode::Nearest);
 
+    let tirs = load_texture("GFX/TileMap/tirs.png").await.unwrap();
+    tirs.set_filter(FilterMode::Nearest);
+
     let spring_in = load_texture("GFX/Items/resized/spring_in.png")
         .await
         .unwrap();
@@ -384,7 +387,6 @@ async fn start() {
                     ..Default::default()
                 },
             );
-            face_right = true;
         }
 
         else if is_key_down(KeyCode::Left) {
