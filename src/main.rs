@@ -4,7 +4,7 @@ use macroquad::{audio::*, prelude::*};
 use macroquad_platformer::*;
 use macroquad_tiled as tiled;
 
-//Donc macroquad_platformer est une crate qui nous permet d'avoir un système monde,
+//Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique,
 //dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
 //préciser certaines informations pour que cela fonctionne.
 //Ce système est basé sur l'article suivant: https://maddythorson.medium.com/celeste-and-towerfall-physics-d24bd2ae0fc5
@@ -16,13 +16,12 @@ struct Joueur {
     vitesse: Vec2,
 }
 
-struct Ennemi {
-    collider: Actor,
-    vitesse: Vec2,
-}
-
 struct Obstacles {
     _collider: Solid,
+}
+
+struct Tirs {
+    collider: bool,
 }
 
 //Les constants du jeu.
@@ -33,9 +32,6 @@ mod consts {
     pub const LIMITE_MONDE: f32 = 5000.0;
     pub const VITESSE_BOOST: f32 = 2.0;
 }
-
-static mut SHOOT:bool = false;
-static mut X: f32 = 4.0;
 
 async fn end() {
     loop {
@@ -62,7 +58,6 @@ async fn end() {
 }
 
 async fn start() {
-    let mut face_right = true;
     //nombre de vies de bunny.
     let mut nombre_vies = 6;
 
@@ -153,20 +148,22 @@ async fn start() {
         .unwrap();
     obstacle.set_filter(FilterMode::Nearest);
 
+    let mut tirs = Vec::new();
+
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
 
     let tiled_map = tiled::load_map(
         &tiled_map_json,
         &[
-            ("Terrain.png", tileset),
-            ("all.png", all),
-            ("bg.png", bg),
-            ("Autumn_entities(16x16).png", autumn),
+        ("Terrain.png", tileset),
+        ("all.png", all),
+        ("bg.png", bg),
+        ("Autumn_entities(16x16).png", autumn),
         ],
         &[],
     )
-    .unwrap();
+        .unwrap();
 
     //Les tuiles statiques, sont sauvegardé dans un vecteur.
     let mut collisions_statiques = vec![];
@@ -185,8 +182,8 @@ async fn start() {
                     Tile::Empty
                 } else if tile
                     .as_ref()
-                    .filter(|tile| tile.tileset == "Autumn_entities(16x16)")
-                    .is_some()
+                        .filter(|tile| tile.tileset == "Autumn_entities(16x16)")
+                        .is_some()
                 {
                     Tile::Empty
                 } else {
@@ -222,11 +219,6 @@ async fn start() {
         _collider: monde.add_solid(vec2(901., 610.), 32, 18),
     };
 
-    let mut ennemi = Ennemi {
-        collider: monde.add_actor(vec2(746., 610.), 25, 32),
-        vitesse: vec2(0., 0.),
-    };
-
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32 * tiled_map.raw_tiled_map.height as f32;
 
@@ -244,15 +236,13 @@ async fn start() {
 
         //Contient la position de Bunny.
         let mut bunny_pos = monde.actor_pos(joueur.collider);
-        // Position ennemi
-        let ennemi_pos = monde.actor_pos(ennemi.collider);
 
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(
-            bunny_pos.x / 3.5,
-            bunny_pos.y / 3.5,
-            screen_width(),
-            screen_height(),
+                bunny_pos.x / 3.5,
+                bunny_pos.y / 3.5,
+                screen_width(),
+                screen_height(),
         ));
 
         //Afficher fond d'écran.
@@ -319,8 +309,6 @@ async fn start() {
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
 
-        //Un bool qui indique si Bunny est sur le sol ou pas.
-        let sur_le_sol_ennemi = monde.collide_check(ennemi.collider, ennemi_pos + vec2(0., 1.));
 
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
         if sur_le_sol == false {
@@ -335,10 +323,6 @@ async fn start() {
                     ..Default::default()
                 },
             );
-
-            if sur_le_sol_ennemi == false {
-                ennemi.vitesse.y += consts::GRAVITE * get_frame_time();
-            }
 
             //Si la position de bunny dépasse la limite du monde,
             //alors le jeu prend fin.
@@ -442,56 +426,18 @@ async fn start() {
                 },
             );
         }
-    /* Système de combat : Le bunny lance une boule sur l'ennemi */
-        unsafe {
-
-        
-        while is_key_released(KeyCode::A ) {
-            
-        if face_right {
-             X = bunny_pos.x;
-            SHOOT = true;
-           
-        }
-        break;
-    }
-    
-    if SHOOT {
-        let y = bunny_pos.y;
-            X += 2.0; 
-            draw_circle(
-                X,
-                y, 
-                 10.5, 
-                 BLUE,
-            );
-    }
-        }
-        draw_texture_ex(
-            ennemi_draw,
-            ennemi_pos.x,
-            ennemi_pos.y,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(25., 32.)),
-                ..Default::default()
-            },
-        );
-
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
-        monde.move_h(ennemi.collider, ennemi.vitesse.x * get_frame_time());
-        monde.move_v(ennemi.collider, ennemi.vitesse.y * get_frame_time());
 
         next_frame().await;
     }
-    
+
 }
 #[macroquad::main("Macroquad")]
 async fn main() {
-    
+
     loop {
         //Image du menu avant le démarrage du jeu.
         let begin = load_texture("GFX/SeasonalTilesets/begin.png")
