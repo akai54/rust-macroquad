@@ -336,7 +336,7 @@ async fn start() {
         }
 
         //Condition pour tirer.
-        if is_key_down(KeyCode::A) {
+        if is_key_pressed(KeyCode::LeftShift) {
             tirs.push(Tirs {
                 collider: false,
                 pos: vec2(bunny_pos.x + 10.0, bunny_pos.y + 10.0),
@@ -434,6 +434,18 @@ async fn start() {
                     ..Default::default()
                 },
             );
+        }
+
+        for tir in tirs.iter() {
+            draw_texture_ex(tirs_texture, tir.pos.x, tir.pos.y, WHITE, DrawTextureParams {
+                source: Some(Rect::new(0.0, 0.0, 8., 8.)),
+                ..Default::default()
+            },
+            );
+        }
+
+        for tir in tirs.iter_mut(){
+            tir.pos.x += 30.;
         }
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
