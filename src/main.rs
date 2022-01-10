@@ -22,6 +22,7 @@ struct Obstacles {
 
 struct Tirs {
     collider: bool,
+    pos: Vec2,
 }
 
 //Les constants du jeu.
@@ -127,8 +128,8 @@ async fn start() {
     let spring = load_texture("GFX/Items/resized/spring.png").await.unwrap();
     spring.set_filter(FilterMode::Nearest);
 
-    let tirs = load_texture("GFX/TileMap/tirs.png").await.unwrap();
-    tirs.set_filter(FilterMode::Nearest);
+    let tirs_texture = load_texture("GFX/TileMap/tirs.png").await.unwrap();
+    tirs_texture.set_filter(FilterMode::Nearest);
 
     let spring_in = load_texture("GFX/Items/resized/spring_in.png")
         .await
@@ -240,9 +241,6 @@ async fn start() {
         //Contient la position de Bunny.
         let mut bunny_pos = monde.actor_pos(joueur.collider);
 
-        //Position des tirs de bunny.
-        let mut tirs_pos = vec2(0., 0.);
-
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(
                 bunny_pos.x / 3.5,
@@ -339,9 +337,9 @@ async fn start() {
 
         //Condition pour tirer.
         if is_key_down(KeyCode::A) {
-            tirs_pos = vec2(bunny_pos.x + 10., bunny_pos.y + 10.);
             tirs.push(Tirs {
                 collider: false,
+                pos: vec2(bunny_pos.x + 10.0, bunny_pos.y + 10.0),
             } 
             ) 
         };
