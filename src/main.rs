@@ -240,6 +240,9 @@ async fn start() {
         //Contient la position de Bunny.
         let mut bunny_pos = monde.actor_pos(joueur.collider);
 
+        //Position des tirs de bunny.
+        let mut tirs_pos = vec2(0., 0.);
+
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(
                 bunny_pos.x / 3.5,
@@ -312,7 +315,6 @@ async fn start() {
         //Un bool qui indique si Bunny est sur le sol ou pas.
         let sur_le_sol = monde.collide_check(joueur.collider, bunny_pos + vec2(0., 1.));
 
-
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
         if sur_le_sol == false {
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
@@ -335,6 +337,14 @@ async fn start() {
             }
         }
 
+        //Condition pour tirer.
+        if is_key_down(KeyCode::A) {
+            tirs_pos = vec2(bunny_pos.x + 10., bunny_pos.y + 10.);
+            tirs.push(Tirs {
+                collider: false,
+            } 
+            ) 
+        };
         // Si bunny est sur le spring, alors il va sauter en l'air.
         if bunny_pos.x > 242. && bunny_pos.x < 308. {
             draw_texture_ex(
@@ -402,7 +412,6 @@ async fn start() {
                     ..Default::default()
                 },
             );
-            face_right = false;
         }
         else if is_key_pressed(KeyCode::Space) {
             if sur_le_sol{
