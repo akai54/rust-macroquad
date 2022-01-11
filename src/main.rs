@@ -3,7 +3,6 @@ use macroquad::ui::root_ui;
 use macroquad::{audio::*, prelude::*};
 use macroquad_platformer::*;
 use macroquad_tiled as tiled;
-use macroquad::experimental::animation::AnimatedSprite;
 
 //Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique,
 //dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
@@ -366,7 +365,9 @@ async fn start() {
             }
         } else {
             joueur.vitesse.x = 0.;
-            anima(bunny_stand, bunny_pos.x, bunny_pos.y, false);
+            if sur_le_sol == true {
+                anima(bunny_stand, bunny_pos.x, bunny_pos.y, false);
+            }
         }
 
         for tir in tirs.iter() {
