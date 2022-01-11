@@ -20,16 +20,11 @@ struct Obstacles {
     _collider: Solid,
 }
 
-struct Tirs {
-    collider: bool,
-    pos: Vec2,
+struct Ennemi {
+    collider: Solid,
+    vitesse: f32,
 }
 
-struct Spikeman {
-    collider: Actor,
-    vitesse: Vec2,
-    sante: f32,
-}
 //Les constants du jeu.
 mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
@@ -171,7 +166,7 @@ async fn start() {
         .unwrap();
     obstacle.set_filter(FilterMode::Nearest);
 
-    let mut tirs = Vec::new();
+    //let mut tirs = Vec::new();
 
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
@@ -232,11 +227,7 @@ async fn start() {
         1,
     );
 
-    let mut ennemi = Spikeman {
-        collider: monde.add_actor(vec2(746., 564.), 45, 78),
-        vitesse: vec2(0., 0.),
-        sante: 0.,
-    };
+
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let mut joueur = Joueur {
         //En ce qui concerne les collision, le joueur est un acteur et non pas un objet statique.
@@ -247,6 +238,10 @@ async fn start() {
         _collider: monde.add_solid(vec2(901., 610.), 32, 18),
     };
 
+    let mut ennemi = Ennemi {
+        collider: monde.add_solid(vec2(746., 564.), 45, 78),
+        vitesse: 50.,
+    };
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32 * tiled_map.raw_tiled_map.height as f32;
@@ -264,10 +259,9 @@ async fn start() {
         set_camera(&camera);
 
         //Contient la position de Bunny.
-        let mut spike_pos = monde.actor_pos(ennemi.collider);
         let mut bunny_pos = monde.actor_pos(joueur.collider);
 
-
+        let mut ennemi_pos = monde.solid_pos(ennemi.collider);
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(
                 bunny_pos.x / 2.,
@@ -328,11 +322,6 @@ async fn start() {
 
         //Condition pour tirer.
         if is_key_pressed(KeyCode::RightShift) {
-            tirs.push(Tirs {
-                collider: true,
-                pos: vec2(bunny_pos.x + 10.0, bunny_pos.y + 10.0),
-            } 
-            ) 
         };
         // Si bunny est sur le spring, alors il va sauter en l'air.
         if bunny_pos.x > 242. && bunny_pos.x < 308. {
@@ -341,6 +330,7 @@ async fn start() {
                 joueur.vitesse.y = consts::VITESSE_SAUT * consts::VITESSE_BOOST;
             }
         }
+
         if nombre_vies < 1 {
             end().await;
             break;
@@ -355,6 +345,14 @@ async fn start() {
             nombre_vies = nombre_vies - 1;
         }
 
+        if ennemi.vitesse > 1. && ennemi_pos.x > 800. {
+            ennemi.vitesse *= -1.;
+        }
+
+        if ennemi.vitesse < 1. && ennemi_pos.x < 480. {
+            ennemi.vitesse *= -1.;
+        }
+
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
             joueur.vitesse.x = consts::VITESSE_MOUV;
@@ -365,6 +363,7 @@ async fn start() {
             joueur.vitesse.x = - consts::VITESSE_MOUV;
             anima(bunny_marche1,bunny_pos.x,bunny_pos.y, true);
         }
+
         else if is_key_pressed(KeyCode::Space) {
             if sur_le_sol{
                 joueur.vitesse.y = consts::VITESSE_SAUT;
@@ -385,22 +384,14 @@ async fn start() {
         }
 
         //Afficher l'ennemi.
-        anima(ennemi_draw, spike_pos.x, spike_pos.y, false);
-
-        for tir in tirs.iter() {
-            anima(tirs_texture, tir.pos.x, tir.pos.y, false);
-        }
-
-        for tir in tirs.iter_mut(){
-            tir.pos.x += 10.;
-            tir.collider = false;
-        }
+        anima(ennemi_draw, ennemi_pos.x, ennemi_pos.y, false);
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
-        monde.move_h(ennemi.collider, ennemi.vitesse.x * get_frame_time());
-        monde.move_v(ennemi.collider, ennemi.vitesse.y * get_frame_time());
+
+        monde.solid_move(ennemi.collider, ennemi.vitesse * get_frame_time(), 0.0);
+        println!("{}", bunny_pos);
 
         next_frame().await;
     }
