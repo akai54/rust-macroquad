@@ -3,6 +3,7 @@ use macroquad::ui::root_ui;
 use macroquad::{audio::*, prelude::*};
 use macroquad_platformer::*;
 use macroquad_tiled as tiled;
+use macroquad::experimental::animation::AnimatedSprite;
 
 //Donc macroquad_platformer est une crate qui nous permet d'avoir un système physique,
 //dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
@@ -32,6 +33,20 @@ mod consts {
     pub const VITESSE_MOUV: f32 = 300.0;
     pub const LIMITE_MONDE: f32 = 5000.0;
     pub const VITESSE_BOOST: f32 = 2.0;
+}
+
+fn anima(texture: Texture2D, x: f32, y: f32, flip: bool){
+            draw_texture_ex(
+                texture,
+                x,
+                y,
+                WHITE,
+                DrawTextureParams {
+                    source: Some(Rect::new(0.0, 0.0, texture.width(), texture.height())),
+                    flip_x: flip,
+                    ..Default::default()
+                },
+            );
 }
 
 async fn end() {
@@ -261,17 +276,6 @@ async fn start() {
             },
         );
 
-        draw_texture_ex(
-            bg,
-            bunny_pos.x / 3.5,
-            bunny_pos.y / 3.5,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(screen_width(), screen_height())),
-                ..Default::default()
-            },
-        );
-
         //Afficher les tuiles.
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
@@ -280,27 +284,11 @@ async fn start() {
             None,
         );
         //Afficher spring.
-        draw_texture_ex(
-            spring,
-            275.,
-            500.,
-            WHITE,
-            DrawTextureParams {
-                source: Some(Rect::new(0.0, 0.0, 32., 17.)),
-                ..Default::default()
-            },
-        );
+        anima(spring, 275., 500., false);
+
         //Afficher obstacle.
-        draw_texture_ex(
-            obstacle,
-            901.,
-            624.,
-            WHITE,
-            DrawTextureParams {
-                source: Some(Rect::new(0.0, 0.0, 32., 18.)),
-                ..Default::default()
-            },
-        );
+        anima(obstacle, 901., 624., false);
+
         //Affichage nombre de vies restants.
         draw_text(
             &nombre_vies.to_string(),
@@ -316,16 +304,7 @@ async fn start() {
         //Si bunny n'est pas sur le sol, alors sa vitesse en l'air va se diminuer.
         if sur_le_sol == false {
             joueur.vitesse.y += consts::GRAVITE * get_frame_time();
-            draw_texture_ex(
-                bunny_jump,
-                bunny_pos.x,
-                bunny_pos.y,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, 32., 39.)),
-                    ..Default::default()
-                },
-            );
+            anima(bunny_jump, bunny_pos.x, bunny_pos.y, false);
 
             //Si la position de bunny dépasse la limite du monde,
             //alors le jeu prend fin.
@@ -345,16 +324,7 @@ async fn start() {
         };
         // Si bunny est sur le spring, alors il va sauter en l'air.
         if bunny_pos.x > 242. && bunny_pos.x < 308. {
-            draw_texture_ex(
-                spring_out,
-                275.,
-                492.,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, 32., 24.)),
-                    ..Default::default()
-                },
-            );
+            anima(spring_out, 275., 492., false);
             if bunny_pos.y == 461. {
                 joueur.vitesse.y = consts::VITESSE_SAUT * consts::VITESSE_BOOST;
             }
@@ -368,16 +338,7 @@ async fn start() {
         if bunny_pos.y == 558.0 && bunny_pos.x > 868. && bunny_pos.x < 934. {
             bunny_pos.y = bunny_pos.y - 100.;
             joueur.vitesse.y = joueur.vitesse.y + consts::VITESSE_SAUT;
-            draw_texture_ex(
-                bunny_hurt,
-                bunny_pos.x,
-                bunny_pos.y,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, 32., 37.)),
-                    ..Default::default()
-                },
-            );
+            anima(bunny_hurt, bunny_pos.x, bunny_pos.y, false);
             play_sound_once(son_blesse);
             nombre_vies = nombre_vies - 1;
         }
@@ -385,31 +346,12 @@ async fn start() {
         //Condition de touche pour bouger bunny.
         if is_key_down(KeyCode::Right) {
             joueur.vitesse.x = consts::VITESSE_MOUV;
-            draw_texture_ex(
-                bunny_marche1,
-                bunny_pos.x,
-                bunny_pos.y,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, 32., 54.)),
-                    ..Default::default()
-                },
-            );
+            anima(bunny_marche1,bunny_pos.x,bunny_pos.y, false);
         }
 
         else if is_key_down(KeyCode::Left) {
             joueur.vitesse.x = - consts::VITESSE_MOUV;
-            draw_texture_ex(
-                bunny_marche1,
-                bunny_pos.x,
-                bunny_pos.y,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, 32., 54.)),
-                    flip_x: true,
-                    ..Default::default()
-                },
-            );
+            anima(bunny_marche1,bunny_pos.x,bunny_pos.y, true);
         }
         else if is_key_pressed(KeyCode::Space) {
             if sur_le_sol{
@@ -424,24 +366,11 @@ async fn start() {
             }
         } else {
             joueur.vitesse.x = 0.;
-            draw_texture_ex(
-                bunny_stand,
-                bunny_pos.x,
-                bunny_pos.y,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, 32., 54.)),
-                    ..Default::default()
-                },
-            );
+            anima(bunny_stand, bunny_pos.x, bunny_pos.y, false);
         }
 
         for tir in tirs.iter() {
-            draw_texture_ex(tirs_texture, tir.pos.x, tir.pos.y, WHITE, DrawTextureParams {
-                source: Some(Rect::new(0.0, 0.0, 8., 8.)),
-                ..Default::default()
-            },
-            );
+            anima(tirs_texture, tir.pos.x, tir.pos.y, false);
         }
 
         for tir in tirs.iter_mut(){
@@ -456,6 +385,8 @@ async fn start() {
     }
 
 }
+
+
 #[macroquad::main("Macroquad")]
 async fn main() {
 
