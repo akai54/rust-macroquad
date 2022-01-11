@@ -314,7 +314,7 @@ async fn start() {
         }
 
         //Condition pour tirer.
-        if is_key_pressed(KeyCode::LeftShift) {
+        if is_key_pressed(KeyCode::RightShift) {
             tirs.push(Tirs {
                 collider: false,
                 pos: vec2(bunny_pos.x + 10.0, bunny_pos.y + 10.0),
@@ -375,7 +375,7 @@ async fn start() {
         }
 
         for tir in tirs.iter_mut(){
-            tir.pos.x += 30.;
+            tir.pos.x += 10.;
         }
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
@@ -386,7 +386,6 @@ async fn start() {
     }
 
 }
-
 
 #[macroquad::main("Macroquad")]
 async fn main() {
