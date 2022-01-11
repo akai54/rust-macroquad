@@ -25,6 +25,11 @@ struct Tirs {
     pos: Vec2,
 }
 
+struct Spikeman {
+    collider: Actor,
+    vitesse: Vec2,
+    sante: f32,
+}
 //Les constants du jeu.
 mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
@@ -35,17 +40,17 @@ mod consts {
 }
 
 fn anima(texture: Texture2D, x: f32, y: f32, flip: bool){
-            draw_texture_ex(
-                texture,
-                x,
-                y,
-                WHITE,
-                DrawTextureParams {
-                    source: Some(Rect::new(0.0, 0.0, texture.width(), texture.height())),
-                    flip_x: flip,
-                    ..Default::default()
-                },
-            );
+    draw_texture_ex(
+        texture,
+        x,
+        y,
+        WHITE,
+        DrawTextureParams {
+            source: Some(Rect::new(0.0, 0.0, texture.width(), texture.height())),
+            flip_x: flip,
+            ..Default::default()
+        },
+    );
 }
 
 async fn end() {
@@ -227,6 +232,11 @@ async fn start() {
         1,
     );
 
+    let mut ennemi = Spikeman {
+        collider: monde.add_actor(vec2(746., 564.), 45, 78),
+        vitesse: vec2(0., 0.),
+        sante: 0.,
+    };
     //Ajout du variable joueur, qui utilise la struct Joueur.
     let mut joueur = Joueur {
         //En ce qui concerne les collision, le joueur est un acteur et non pas un objet statique.
@@ -236,6 +246,7 @@ async fn start() {
     let mut _obs = Obstacles {
         _collider: monde.add_solid(vec2(901., 610.), 32, 18),
     };
+
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
     let longeur = tiled_map.raw_tiled_map.tileheight as f32 * tiled_map.raw_tiled_map.height as f32;
@@ -253,7 +264,9 @@ async fn start() {
         set_camera(&camera);
 
         //Contient la position de Bunny.
+        let mut spike_pos = monde.actor_pos(ennemi.collider);
         let mut bunny_pos = monde.actor_pos(joueur.collider);
+
 
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(
@@ -316,7 +329,7 @@ async fn start() {
         //Condition pour tirer.
         if is_key_pressed(KeyCode::RightShift) {
             tirs.push(Tirs {
-                collider: false,
+                collider: true,
                 pos: vec2(bunny_pos.x + 10.0, bunny_pos.y + 10.0),
             } 
             ) 
@@ -363,12 +376,16 @@ async fn start() {
                     },
                 );
             }
-        } else {
+        } 
+        else {
             joueur.vitesse.x = 0.;
             if sur_le_sol == true {
                 anima(bunny_stand, bunny_pos.x, bunny_pos.y, false);
             }
         }
+
+        //Afficher l'ennemi.
+        anima(ennemi_draw, spike_pos.x, spike_pos.y, false);
 
         for tir in tirs.iter() {
             anima(tirs_texture, tir.pos.x, tir.pos.y, false);
@@ -376,11 +393,14 @@ async fn start() {
 
         for tir in tirs.iter_mut(){
             tir.pos.x += 10.;
+            tir.collider = false;
         }
 
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
+        monde.move_h(ennemi.collider, ennemi.vitesse.x * get_frame_time());
+        monde.move_v(ennemi.collider, ennemi.vitesse.y * get_frame_time());
 
         next_frame().await;
     }
