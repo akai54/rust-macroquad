@@ -257,8 +257,8 @@ async fn start() {
 
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(
-                bunny_pos.x / 3.5,
-                bunny_pos.y / 3.5,
+                bunny_pos.x / 2.,
+                bunny_pos.y / 2.,
                 screen_width(),
                 screen_height(),
         ));
@@ -266,8 +266,8 @@ async fn start() {
         //Afficher fond d'écran.
         draw_texture_ex(
             bg,
-            bunny_pos.x / 3.5,
-            bunny_pos.y / 3.5,
+            bunny_pos.x / 2.,
+            bunny_pos.y / 2.,
             WHITE,
             DrawTextureParams {
                 dest_size: Some(vec2(screen_width(), screen_height())),
