@@ -31,6 +31,7 @@ cargo run
 ```
 ## Problème lancement 
 Si jamais vous n'arrivez pas à appuyer sur le bouton jouer, alors dans ce cas là vous devriez appuyer là ou le pointeur de la souris se trouve.
+![Capture](Capture_Lancement.png)
 
 ## Utilisation
 Les flèches pour bouger le personnage.\
