@@ -330,7 +330,7 @@ async fn start() {
         if is_key_pressed(KeyCode::RightShift) {
             //Afficher l'balle.
             tirer.push(Balle {
-                collider:true,
+                _collider:true,
                 pos: vec2(bunny_pos.x + 10.0, bunny_pos.y + 10.0),
             }
             );
@@ -359,7 +359,7 @@ async fn start() {
         }
 
         //Si bunny est sur l'obstacle de l'ennemi.
-        if bunny_pos.y == 512.0 && bunny_pos.x >= ennemi_pos.x - 9.  {
+        if bunny_pos.y == 512.0 && bunny_pos.x == ennemi_pos.x || bunny_pos.x == ennemi_pos.x -4.{
             bunny_pos.y = bunny_pos.y - 100.;
             joueur.vitesse.y = joueur.vitesse.y + consts::VITESSE_SAUT;
             anima(bunny_hurt, bunny_pos.x, bunny_pos.y, false);
@@ -420,8 +420,6 @@ async fn start() {
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
 
         monde.solid_move(ennemi.collider, ennemi.vitesse * get_frame_time(), 0.0);
-
-        println!("{}", bunny_pos);
 
         next_frame().await;
     }
