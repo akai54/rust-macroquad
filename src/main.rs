@@ -1,4 +1,4 @@
-// Utilisation des bibliotheques necessaires.
+// Utilisation des bibliothèques nécessaires.
 use macroquad::ui::root_ui;
 use macroquad::{audio::*, prelude::*};
 use macroquad_platformer::*;
@@ -8,7 +8,7 @@ use macroquad_tiled as tiled;
 //dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
 //préciser certaines informations pour que cela fonctionne.
 //Ce système est basé sur l'article suivant: https://maddythorson.medium.com/celeste-and-towerfall-physics-d24bd2ae0fc5
-//écrit par Maddy thorson pour les jeux qu'il a devloppé.
+//écrit par Maddy thorson pour les jeux qu'il a développé.
 
 //Structure pour le joueur, qui contient la vitesse ainsi que son type de collision.
 struct Joueur {
@@ -26,7 +26,7 @@ struct Ennemi {
 }
 
 struct Balle {
-    collider: bool,
+    _collider: bool,
     pos: Vec2,
 }
 
@@ -88,7 +88,7 @@ async fn start() {
     //Ajout tileset
     let tileset = load_texture("GFX/TileMap/Terrain.png").await.unwrap();
 
-    //Sets the FilterMode of this texture.
+    //Rend la qualité des assets meilleur.
     tileset.set_filter(FilterMode::Nearest);
 
     let autumn = load_texture("GFX/TileMap/Autumn_entities(16x16).png")
@@ -197,7 +197,7 @@ async fn start() {
         collisions_statiques.push(
             //OK donc, ici cette boucle est censé donner des collisions aux tiles suivant la tilemap
             //crée, sauf qu'avec cette condition, les tiles venant de la tileset "all" n'auront pas
-            //de collisions !! C'est donc merveillieux pour les décorations.
+            //de collisions !! C'est donc merveilleux pour les décorations.
             //Update: filter plus simple que map.
             //Encore plus simple.
             if tile.is_some() {
@@ -222,7 +222,7 @@ async fn start() {
 
     //Ici on ajoute les tuiles qui sont statiques,
     //on leur connait grace à la taille des tuiles en pixel de la tilemap.
-    //Donc par ordre: largeur de la tuile - longeur de la tuile - largeur et le label ou
+    //Donc par ordre: largeur de la tuile - longueur de la tuile - largeur et le label ou
     //l'étiquette.
     monde.add_static_tiled_layer(
         collisions_statiques,
@@ -249,7 +249,7 @@ async fn start() {
     };
 
     let largeur = tiled_map.raw_tiled_map.tilewidth as f32 * tiled_map.raw_tiled_map.width as f32;
-    let longeur = tiled_map.raw_tiled_map.tileheight as f32 * tiled_map.raw_tiled_map.height as f32;
+    let longueur = tiled_map.raw_tiled_map.tileheight as f32 * tiled_map.raw_tiled_map.height as f32;
 
     play_sound(
         son_bg,
@@ -292,7 +292,7 @@ async fn start() {
         tiled_map.draw_tiles(
             // The name of the layer in assets/map.json
             "main-layer",
-            Rect::new(0.0, 0.0, largeur, longeur),
+            Rect::new(0.0, 0.0, largeur, longueur),
             None,
         );
         //Afficher spring.
