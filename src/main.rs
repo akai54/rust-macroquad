@@ -358,6 +358,15 @@ async fn start() {
             nombre_vies = nombre_vies - 1;
         }
 
+        //Si bunny est sur l'obstacle de l'ennemi.
+        if bunny_pos.y == 512.0 && bunny_pos.x >= ennemi_pos.x - 9.  {
+            bunny_pos.y = bunny_pos.y - 100.;
+            joueur.vitesse.y = joueur.vitesse.y + consts::VITESSE_SAUT;
+            anima(bunny_hurt, bunny_pos.x, bunny_pos.y, false);
+            play_sound_once(son_blesse);
+            nombre_vies = nombre_vies - 1;
+        }
+         
         //Mouvement de l'ennemi.
         if ennemi.vitesse > 1. && ennemi_pos.x > 800. {
             ennemi.vitesse *= -1.;
