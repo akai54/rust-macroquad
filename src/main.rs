@@ -8,7 +8,7 @@ use macroquad_tiled as tiled;
 //dans notre jeu, sans avoir à tout manipuler de manière manuelle, mais il faudra quand meme
 //préciser certaines informations pour que cela fonctionne.
 //Ce système est basé sur l'article suivant: https://maddythorson.medium.com/celeste-and-towerfall-physics-d24bd2ae0fc5
-//écrit par Maddy thorson pour les jeux qu'il a développé.
+//écrit par Maddy Thorson pour les jeux qu'il a développé.
 
 //Structure pour le joueur, qui contient la vitesse ainsi que son type de collision.
 struct Joueur {
