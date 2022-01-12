@@ -25,6 +25,11 @@ struct Ennemi {
     vitesse: f32,
 }
 
+struct Balle {
+    collider: bool,
+    pos: Vec2,
+}
+
 //Les constants du jeu.
 mod consts {
     pub const VITESSE_SAUT: f32 = -700.0;
@@ -166,7 +171,7 @@ async fn start() {
         .unwrap();
     obstacle.set_filter(FilterMode::Nearest);
 
-    //let mut tirs = Vec::new();
+    let mut tirer = Vec::new();
 
     //Charger le fichier json de la map.
     let tiled_map_json = load_string("GFX/TileMap/map.json").await.unwrap();
@@ -261,7 +266,8 @@ async fn start() {
         //Contient la position de Bunny.
         let mut bunny_pos = monde.actor_pos(joueur.collider);
 
-        let mut ennemi_pos = monde.solid_pos(ennemi.collider);
+        let ennemi_pos = monde.solid_pos(ennemi.collider);
+
         //La caméra suit le joueur.
         camera = Camera2D::from_display_rect(Rect::new(
                 bunny_pos.x / 2.,
@@ -322,7 +328,14 @@ async fn start() {
 
         //Condition pour tirer.
         if is_key_pressed(KeyCode::RightShift) {
+            //Afficher l'balle.
+            tirer.push(Balle {
+                collider:true,
+                pos: vec2(bunny_pos.x + 10.0, bunny_pos.y + 10.0),
+            }
+            );
         };
+
         // Si bunny est sur le spring, alors il va sauter en l'air.
         if bunny_pos.x > 242. && bunny_pos.x < 308. {
             anima(spring_out, 275., 492., false);
@@ -345,6 +358,7 @@ async fn start() {
             nombre_vies = nombre_vies - 1;
         }
 
+        //Mouvement de l'ennemi.
         if ennemi.vitesse > 1. && ennemi_pos.x > 800. {
             ennemi.vitesse *= -1.;
         }
@@ -386,11 +400,18 @@ async fn start() {
         //Afficher l'ennemi.
         anima(ennemi_draw, ennemi_pos.x, ennemi_pos.y, false);
 
+        for tir in tirer.iter(){
+            anima(tirs_texture, tir.pos.x, tir.pos.y, false);
+        }
+        for tir in tirer.iter_mut(){
+            tir.pos.x += 10.;
+        }
         //On affiche le joueur grace à sa position communiqué par macroquad_platformer.
         monde.move_h(joueur.collider, joueur.vitesse.x * get_frame_time());
         monde.move_v(joueur.collider, joueur.vitesse.y * get_frame_time());
 
         monde.solid_move(ennemi.collider, ennemi.vitesse * get_frame_time(), 0.0);
+
         println!("{}", bunny_pos);
 
         next_frame().await;
