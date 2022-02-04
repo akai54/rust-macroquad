@@ -10,12 +10,12 @@ cause d'un manque de temps, d'exemple, de fonctionnalités.
 Clone [ssh](https://pip.pypa.io/en/stable/).
 
 ```bash
-git clone git@code.up8.edu:besher/projet_rust_macroquad.git
+git clone git@github.com:akai54/rust-macroquad.git
 ```
 Clone [https](https://code.up8.edu/beshe/projet_rust_macroquad.git).
 
 ```bash
-git clone git@code.up8.edu:besher/projet_rust_macroquad.git
+git clone https://github.com/akai54/rust-macroquad.git
 ```
 
 ## Lancement
